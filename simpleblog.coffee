@@ -2,26 +2,46 @@ bogart = require "bogart"
 couchdb = require "couchdb"
 dbConfig =
     user: "zach"
-    pass: "5984"
+    password: "5984"
 
 app = bogart.router (get, post, update, destroy) ->
-    client     = couchdb.createClient 8080, "127.0.0.1", dbConfig
-    db         = client.db "blog"
+    client     = couchdb.createClient 5984, "localhost", dbConfig
+    db         = client.db "simpleblog"
     viewEngine = bogart.viewEngine "mustache"
 
     get '/', () ->
         bogart.html "Hello, node!"
 
     get "/posts/new", (request) ->
-        title = locals: title: 'New Post'
-        viewEngine.respond "new-post.html", title
+        viewEngine.respond "new-post.html", locals: title: 'New Post'
+
+    get "/posts", (request) ->
+        db.view("blog", "posts_by_date").then (response) ->
+            posts = response.rows.map (x) -> x.value
+            viewEngine.respond "posts.html",
+                locals:
+                    posts: posts
+                    title: "simpleblog"
 
     post "/posts", (request) ->
-        pos = request.params
+        post = request.params
         post.type = "post"
 
-        db.saveDoc.then (response) ->
+        db.saveDoc(post).then (response) ->
             bogart.redirect "/posts"
+
+    get "/posts/:id", (request) ->
+        db.openDoc(request.params.id).then (post) ->
+            viewEngine.respond "posts.html", locals: post
+
+    post "/posts/:id/comments", (request) ->
+            comment = req.params
+            db.openDoc(comment.id).then (post) ->
+                post.comments = post.comments or []
+                post.comments.push(comment)
+
+                db.saveDoc(post).then (response) ->
+                    bogart.redirect "/posts/"+comment.id
 
 app = bogart.middleware.ParseForm app
 bogart.start app
