@@ -1,10 +1,10 @@
 {
-    "name": "blog",
+    "name": "simpleblog",
     "description": "Simple Blogging Engine",
     "version": "0.1.0",
     "author": "Zach Fogg",
     "email": "zach@zachfogg.com"
-    "main": "./app",
+    "main": "./",
     "directories": { "lib": "./lib" },
     "dependencies": {
       "bogart": ">=0.2.0",

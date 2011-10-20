@@ -4,6 +4,8 @@ dbConfig =
     user: "zach"
     password: "5984"
 
+_ = require "underscore"
+
 app = bogart.router (get, post, update, destroy) ->
     client     = couchdb.createClient 5984, "localhost", dbConfig
     db         = client.db "simpleblog"
@@ -33,8 +35,8 @@ app = bogart.router (get, post, update, destroy) ->
         db.openDoc(request.params.id).then (post) ->
             viewEngine.respond "post.html", locals: post
 
-    post "/posts/:id/comments", (request) ->
-            comment = req.params
+    post "/posts/:id/comment", (request) ->
+            comment = request.params
             db.openDoc(comment.id).then (post) ->
                 post.comments = post.comments or []
                 post.comments.push(comment)

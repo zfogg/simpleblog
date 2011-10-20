@@ -11,12 +11,13 @@
   <ul id="comments">
     {{#comments}}
       <li>
-        <div>
-          Author: <span class="author">{{author}}</span>
-        </div>
-        <div>
-          {{body}}
-        </div>
+
+      <div class="comment-head"<span class="author"> {{author}} </span> </div>
+
+        /*
+        <div class="comment"> {{body}} </div>
+        */
+
       </li>
     {{/comments}}
 
@@ -26,22 +27,15 @@
   </ul>
 </div>
 
-<form method="post" action="/posts/{{_id}}/comments">
+<form method="post" action="/posts/{{_id}}/comment">
   <fieldset>
     <legend>Something to say?</legend>
 
-    <div>
-      <label for="author">Your name:</label>
-      <input name="author" />
-    </div>
+    <div> <label for="author">Your name:</label> <input name="author" /> </div>
 
-    <div>
-      <label for="body">Your comment:</label>
-      <input name="body" />
-    </div>
+    <div> <label for="body">Your comment:</label> <input name="body" /> </div>
 
-    <div class="buttons">
-      <input type="submit" value="Post Comment" />
-    </div>
+    <div class="button"> <input type="submit" value="Post Comment" /> </div>
+
   </fieldset>
 </form>
