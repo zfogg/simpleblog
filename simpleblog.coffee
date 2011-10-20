@@ -17,10 +17,9 @@ app = bogart.router (get, post, update, destroy) ->
 
     get "/posts", (request) ->
         db.view("blog", "posts_by_date").then (response) ->
-            posts = response.rows.map (x) -> x.value
             viewEngine.respond "posts.html",
                 locals:
-                    posts: posts
+                    posts: response.rows.map (x) -> x.value
                     title: "simpleblog"
 
     post "/posts", (request) ->
@@ -32,7 +31,7 @@ app = bogart.router (get, post, update, destroy) ->
 
     get "/posts/:id", (request) ->
         db.openDoc(request.params.id).then (post) ->
-            viewEngine.respond "posts.html", locals: post
+            viewEngine.respond "post.html", locals: post
 
     post "/posts/:id/comments", (request) ->
             comment = req.params
