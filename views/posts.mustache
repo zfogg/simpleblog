@@ -5,13 +5,11 @@
 <ul>
     {{#posts}}
     <li>
-    <div class="post">
-        <h2><a href="/posts/{{_id}}">{{title}}</a></h2>
-        <h3>{{date}}</h3>
-        <p>
-        {{body}}
-        </p>
-    </div>
+        <div class="post">
+            <h3><a href="/posts/{{_id}}">{{title}}</a></h3> - <h4>{{date}}</h4>
+            <p> {{body}} </p>
+            <hr />
+        </div>
     </li>
     {{/posts}}
 </ul>
