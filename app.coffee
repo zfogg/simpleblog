@@ -20,10 +20,12 @@ app.configure ->
     app.set 'view engine', "coffee"
     app.use express.bodyParser()
     app.use express.methodOverride()
-    app.use app.router
     app.use express.static __dirname + "/public"
+    app.use express.favicon()
 
-app.configure "development", -> app.use express.errorHandler (dumbExceptions: true, showStack: true)
+app.configure "development", ->
+    app.use express.errorHandler (dumbExceptions: true, showStack: true)
+    app.use express.logger (format: ":method :referrer --> :url")
 
 app.configure "production", -> app.use express.errorHandler()
 
@@ -57,18 +59,20 @@ postPrerender = (posts) ->
     _(posts).map (post) -> timeStamped post.value, DATE_FORMAT_MUSTACHE
 
 app.get "/posts/page/:pageNumber", (req, res) ->
-    pageNumber = parseInt req.params.pageNumber, 10
-    (db.view "blog", "posts_by_date").then (results) ->
-        posts = results.rows
-        for i in [0...pageNumber - 1]
-            posts = _(posts).difference _(posts).rest posts.length - POST_LIMIT
+    if isNaN req.params.pageNumber
+        res.redirect "/posts"
+    else
+        pageNumber = parseInt req.params.pageNumber, 10
+        (db.view "blog", "posts_by_date").then (results) ->
+            posts = results.rows
+            for i in [0...pageNumber - 1]
+                posts = _(posts).difference _(posts).tail posts.length - POST_LIMIT
 
-        posts = postPrerender posts
-        res.render "posts", (title: "simpleblog", posts: posts, pageNumber: pageNumber)
+            posts = postPrerender posts
+            res.render "posts", (title: "simpleblog", posts: posts, pageNumber: pageNumber)
 
 app.post "/posts", (req, res) ->
     post = req.body
-    console.log post
 
     post.type = "post"
     if validPost post
@@ -78,15 +82,12 @@ app.post "/posts", (req, res) ->
 
 app.get "/posts/:id", (req, res) ->
     (db.openDoc req.params.id).then (post) ->
-        console.log post
         res.render "post", post
 
 app.post "/posts/:id/comment", (req, res) ->
     comment = req.body
     id = req.params.id
-    console.log id
     (db.openDoc id).then (post) ->
-        console.log post
         post.comments = post.comments or []
         if validComment comment
             post.comments.push timeStamped comment, DATE_FORMAT_COUCHDB

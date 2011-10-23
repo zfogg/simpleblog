@@ -12,7 +12,12 @@ ul ->
 
 div "pagenav", style: "text-align: center;", ->
     if @pageNumber > 1 and @posts.length
-        a href: "/posts/page/" + (@pageNumber - 1).toString(), "<-- Previous Page"
-        text "  |  "
+        if @pageNumber is 2
+            a href: "/posts", "Previous Page"
+        else
+            a href: "/posts/page/" + (@pageNumber - 1), "Previous Page"
+        text " <"
+    text "|"
     if @posts.length >= 5
-        a href: "/posts/page/" + (@pageNumber + 1).toString(), "Next Page -->"
+        text "> "
+        a href: "/posts/page/" + ((@pageNumber or 1) + 1), "Next Page"
