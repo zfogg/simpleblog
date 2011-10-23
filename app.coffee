@@ -14,7 +14,6 @@ Config
 ###
 app = express.createServer()
 app.register '.coffee', require('coffeekup').adapters.express
-console.log app
 
 app.configure ->
     app.set 'views', __dirname + '/views'
@@ -61,17 +60,21 @@ app.post "/posts", (req, res) ->
 
 app.get "/posts/:id", (req, res) ->
     db.openDoc(req.params.id).then (post) ->
+        console.log post
         res.render "post", post
 
 app.post "/posts/:id/comment", (req, res) ->
-    comment = req.params
-    (db.openDoc comment.id).then (post) ->
+    comment = req.body
+    id = req.params.id
+    console.log id
+    (db.openDoc id).then (post) ->
+        console.log post
         post.comments = post.comments or []
         if validComment comment
             post.comments.push timeStamped comment, DATE_FORMAT_COUCHDB
 
         (db.saveDoc post).then () ->
-            res.redirect "/posts/"+comment.id
+            res.redirect "/posts/"+id
 
 validPost    = (post)    -> post.title and post.body
 validComment = (comment) -> comment.author and comment.body
