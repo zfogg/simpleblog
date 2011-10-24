@@ -1,5 +1,5 @@
 ###
-Dependencies
+# Dependencies
 ###
 require.paths.push "./lib"
 
@@ -10,7 +10,7 @@ _              = require "underscore"
 require "date-utils"
 
 ###
-Config
+# Config
 ###
 app = express.createServer()
 app.register '.coffee', require('coffeekup').adapters.express
@@ -36,7 +36,7 @@ POST_LIMIT    = 5
 COMMENT_LIMIT = 100
 
 ###
-Routes
+# Routes
 ###
 app.get '/', (req, res) ->
     res.render "index"
@@ -46,30 +46,21 @@ app.get "/posts/new", (req, res) ->
 
 app.get "/posts", (req, res) ->
     (db.view "blog", "posts_by_date").then (results) ->
-        posts = results.rows
-
-        posts = postPrerender posts
+        posts = postPrerender results.rows
         res.render "posts", (title: "simpleblog", posts: posts)
 
-postPrerender = (posts) ->
-    if posts.length > POST_LIMIT
-        posts = _(posts).last POST_LIMIT
-
-    _(posts).reverse()
-    _(posts).map (post) -> timeStamped post.value, DATE_FORMAT_MUSTACHE
-
 app.get "/posts/page/:pageNumber", (req, res) ->
-    if isNaN req.params.pageNumber
-        res.redirect "/posts"
-    else
-        pageNumber = parseInt req.params.pageNumber, 10
-        (db.view "blog", "posts_by_date").then (results) ->
-            posts = results.rows
-            for i in [0...pageNumber - 1]
-                posts = _(posts).difference _(posts).tail posts.length - POST_LIMIT
+    for x in req.params.pageNumber.split ""
+        res.redirect "/posts" if isNaN x
 
-            posts = postPrerender posts
-            res.render "posts", (title: "simpleblog", posts: posts, pageNumber: pageNumber)
+    pageNumber = parseInt req.params.pageNumber, 10
+    (db.view "blog", "posts_by_date").then (results) ->
+        posts = results.rows
+        for i in [0...pageNumber - 1]
+            posts = (_ posts).difference (_ posts).tail posts.length - POST_LIMIT
+
+        posts = postPrerender posts
+        res.render "posts", (title: "simpleblog", posts: posts, pageNumber: pageNumber)
 
 app.post "/posts", (req, res) ->
     post = req.body
@@ -77,8 +68,9 @@ app.post "/posts", (req, res) ->
     post.type = "post"
     if validPost post
         db.saveDoc timeStamped post, DATE_FORMAT_COUCHDB
-
-    res.redirect "/posts"
+        res.redirect "/posts"
+    else
+        res.redirect "/posts/new"
 
 app.get "/posts/:id", (req, res) ->
     (db.openDoc req.params.id).then (post) ->
@@ -95,6 +87,15 @@ app.post "/posts/:id/comment", (req, res) ->
         (db.saveDoc post).then () ->
             res.redirect "/posts/"+id
 
+###
+# Helper Functions
+####
+postPrerender = (posts) ->
+    if posts.length > POST_LIMIT
+        posts = (_ posts).last POST_LIMIT
+    (_ posts).reverse()
+    (_ posts).map (post) -> timeStamped post.value, DATE_FORMAT_MUSTACHE
+
 validPost    = (post)    -> post.title and post.body
 validComment = (comment) -> comment.author and comment.body
 
@@ -104,4 +105,5 @@ timeStamped = (o = {}, toFormat = (d) -> d) ->
 DATE_FORMAT_COUCHDB  = (d) -> d.toFormat "MM-DD-YYYY HH24:MI:SS"
 DATE_FORMAT_MUSTACHE = (d) -> d.getMonthName() + d.toFormat " DD, YYYY - HH24:MI"
 
+# Start app.
 app.listen 8080
