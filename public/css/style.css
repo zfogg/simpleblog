@@ -164,6 +164,7 @@ header h2, header h3 {
 .post hgroup h4 {
   display: inline-block;
   float: right;
+  margin-top:-5px;
 }
 #new-post #title, #new-post #body {
   line-height: .75em;

@@ -1,19 +1,22 @@
 {
     "name": "simpleblog"
-  . "description": "Simple blogging engine."
+  , "description": "Simple blogging engine."
   , "version": "0.1.0"
   , "author": "Zach Fogg"
   , "email": "zach@zachfogg.com"
   , "main": "./"
   , "directories": {
         "lib": "./lib"
-      . "views": "./views"
+      , "views": "./views"
       , "public": "./public"
   }
   , "dependencies": {
       "express": "2.4.7"
-    , "couchdb": ">=0.1.2"
+    , "couchdb": "0.1.2"
+    , "coffee-script": ">=1.1.2"
+    , "coffeekup": ">=0.3.1
+    , "underscore": ">=1.1.2"
     , "date-utils": ">=1.2.4"
-    , "markdown": ">=0.3.0"
+    , "github-flavored-markdown": ">=1.0.0"
   }
 }
