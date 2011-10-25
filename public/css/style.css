@@ -54,7 +54,7 @@ input[type="checkbox"], input[type="radio"] { box-sizing: border-box; }
 input[type="search"] { -webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; }
 input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
 button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
-textarea { overflow: auto; vertical-align: top; resize: vertical; }
+textarea { overflow: auto; vertical-align: top; }
 input:valid, textarea:valid {  }
 input:invalid, textarea:invalid { background-color: #f0dddd; }
 
@@ -65,9 +65,6 @@ td { vertical-align: top; }
    Author: Z. Fogg
    ========================================================================== */
 
-a {
-  color: #00B7FF;
-}
 body:before {
   content: "";
   position: fixed;
@@ -75,12 +72,9 @@ body:before {
   left: 0;
   width: 100%;
   height: 10px;
-
   box-shadow: 0 0 10px rgba(0,0,0,.8);
-
   z-index: 100;
 }
-
 body {
   height: 100%;
   background-color: rgb(245, 245, 245);
@@ -88,13 +82,11 @@ body {
   padding: 50px;
   padding:0;
 }
-
 #container {
   min-height: 100%;
   margin: 0 auto;
   max-width: 80em;
 }
-
 header {
   font:normal 24px/24px "Trebuchet MS",Georgia,Arial,Helvetica;
   text-shadow:0 0 3px #444,2px 2px 3px #bbb;
@@ -102,16 +94,17 @@ header {
   margin: 0 25px 0 25px;
   box-shadow: 0 4px 2px -2px gray;
 }
-
 #main {
   font-face:"Trebuchet MS",Georgia,Arial,Helvetica;
   color:#222;
   padding: 50px 25px -35px 25px;
   margin: 20px auto;
   min-width: 400px;
-  max-width: 840px;
+  max-width: 720px;
 }
-
+hgroup {
+  padding: 4px 2px 9px 2px;
+}
 h1 {
   font-size: 28px;
   line-height: 108%;
@@ -120,16 +113,14 @@ h1 {
   font-variant: small-caps;
   text-shadow: 2px 1px 3px #2f4f4f;
 }
-
-h2 {
+h2, .post #title input {
   color:#515151;
   font:bold 26px/28px "Trebuchet MS",Georgia,Arial,Helvetica;
   letter-spacing:-1px;
   text-shadow:3px 2px 3px #b8b8b8;
   margin:0;
-  padding:0 6px 0 2px;
 }
-h3 {
+h3, #new-post label {
   color:#666;
   font:normal 25px/25px "Trebuchet MS",Georgia,Arial,Helvetica;
   letter-spacing:-1px;
@@ -137,12 +128,15 @@ h3 {
   margin:0;
   padding:0 2px 0 4px;
 }
-h2 a, h2 a:visited, h3 a, h3 a:visited {
+h4 {
+  color: #515151;
+  margin: 0;
+  padding: 0.2em 0 0.1em 0;
+}
+h2 a, h2 a:visited, h3 a, h3 a:visited h4 a:visited {
   color:#515151; border:0;
 }
-h2 a:hover, h3 a:hover {
-  color:#000;
-}
+h2 a:hover, h3 a:hover { color:#000; }
 header h2, header h3 {
   text-align: center;
   padding-bottom: 0.25em;
@@ -153,8 +147,38 @@ header h2, header h3 {
   padding: 12px;
   margin: 15px;
 }
-.post h3, .post h4 {
-  display: inline-block;
-  margin-right: 5px;
-  margin-left: 5px;
+.post .content {
+  margin: 0 10px 10px 10px;
 }
+.post textarea {
+  width: 100%;
+  margin: 3px 0 7px 0;
+  padding: 0;
+}
+.post h2 {
+  display: inline-block;
+  margin-right: 12px;
+  margin-bottom: 12px;
+  margin-left: -2px;
+}
+.post hgroup h4 {
+  display: inline-block;
+  float: right;
+}
+#new-post #title, #new-post #body {
+  line-height: .75em;
+  padding-bottom: 7px;
+}
+#new-post #title input {
+  width: 100%;
+  padding: 0;
+}
+.syntaxhighlighter { padding: 1px !important; }
+.button input {
+  border: solid 1px rgb(133, 177, 222);
+  background-color: rgba(237, 242, 247, 0.55);
+  display: block;
+  margin: 2px auto 2px auto;
+  padding: 4px;
+}
+a { color: #00B7FF; }

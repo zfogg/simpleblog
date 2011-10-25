@@ -1,28 +1,44 @@
-a href: "/posts", -> "Home"
-h1 @title
+header -> h2 "simpleblog"
 
-div "post-content", -> @body
-do br
+div "#main", ->
+    h3 -> a href: "/posts", -> "Home"
+    div "post", ->
+        hgroup ->
+            h2 @title
+            h4 @date
+        div "content", -> @body
 
-if @comments
-    div -> h2 "Comments"
-    for comment in @comments
-        ul id: "comments", ->
-            li ->
-                div "comment-head", -> span "author", -> comment.author
-                div "comment", -> comment.body
+        do hr
+        form id: "comment-form", method: "post", style: "display:none;", action: "/posts/#{@_id}/comment", ->
+            fieldset ->
 
-form method: "post", action: "/posts/#{@_id}/comment", ->
-    fieldset ->
-        legend "Something to say?"
+                div ->
+                    label for: "author", -> "Your name:"
+                    do br
+                    input name: "author"
 
-        div ->
-            label for: "author", -> "Your name:"
-            input name: "author"
+                div ->
+                    label for: "body", -> "Your comment:"
+                    textarea name: "body", rows: 10
 
-        div ->
-            label for: "body", -> "Your comment:"
-            input name: "body"
+                div "button", ->
+                    input type: "submit", value: "Post Comment"
 
-        div "button", ->
-            input type: "submit", value: "Post Comment"
+        h4 "#toggle-form", ->
+            text "Something to say? "
+            a "Click here."
+            script -> """
+                $("#toggle-form").click(function() {
+                    $("#toggle-form").fadeOut(450);
+                    $("#comment-form").toggle("slow");
+                });
+            """
+
+        if @comments
+            div "#comments", ->
+                do hr
+                h3 "Comments"
+                for comment in @comments
+                    div "comment", ->
+                        span "author", -> h4 comment.author
+                        div "body", -> comment.body

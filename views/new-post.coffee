@@ -1,14 +1,19 @@
-form method: "post", action: "/posts", ->
-    fieldset ->
-        legend "New Post"
+header -> h2 "New Post"
 
-        div ->
-            label for: "title", -> "Title"
-            input name: "title"
+div "#main", -> 
+    h3 -> a href: "/posts", "Home"
+    div "post", ->
+        form id: "new-post", method: "post", action: "/posts", ->
+            fieldset ->
+                div "#title", ->
+                    label for: "title", -> "Title"
+                    do br
+                    input name: "title"
 
-        div ->
-            label for: "body", -> "Body"
-            textarea name: "body", rows: "15", columns: "25"
+                div "#body", ->
+                    label for: "body", -> "Body"
+                    do br
+                    textarea name: "body", rows: "25"
 
-        div "buttons", ->
-            input type: "submit", value: "Save Post"
+                div "button", ->
+                    input type: "submit", value: "Save Post"

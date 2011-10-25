@@ -1,14 +1,14 @@
 header ->
-    h2 "Posts"
+    h2 "simpleblog"
 
 div "#main", ->
+    h3 -> a href: "/posts/new", -> "New Post"
     for post in @posts
         div "post", ->
-            h3 -> a href: "/posts/#{post._id}", -> post.title
-            h4 post.date
-            p post.body
-
-    a href: "/posts/new", -> "New Post"
+            hgroup ->
+                h2 -> a href: "/posts/#{post._id}", -> post.title
+                h4 post.date
+            div "content", -> post.body
 
     div "pagenav", style: "text-align: center;", ->
         if @pageNumber > 1 and @posts.length

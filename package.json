@@ -14,5 +14,6 @@
       "express": "2.4.7"
     , "couchdb": ">=0.1.2"
     , "date-utils": ">=1.2.4"
+    , "markdown": ">=0.3.0"
   }
 }
