@@ -12,7 +12,7 @@
   }
   , "dependencies": {
       "express": "2.4.7"
-    , "couchdb": "0.1.2"
+    , "couchdb": ">=0.2.0a"
     , "coffee-script": ">=1.1.2"
     , "coffeekup": ">=0.3.1"
     , "underscore": ">=1.1.2"

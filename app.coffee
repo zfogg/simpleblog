@@ -46,7 +46,7 @@ app.get "/posts", (req, res) ->
     (db.view "blog", "posts_by_date").then (results) ->
         res.render "posts", (
             title: "simpleblog",
-            posts: (postToHTML results.rows)
+            posts: (postsToHTML results.rows)
         )
 
 app.get "/posts/page/:pageNumber", (req, res) ->
@@ -58,13 +58,13 @@ app.get "/posts/page/:pageNumber", (req, res) ->
         posts = (_ results.rows).initial POST_LIMIT * (pageNumber - 1)
         res.render "posts", (
             title: "Page #{pageNumber}|simpleblog",
-            posts: (postToHTML posts),
+            posts: (postsToHTML posts),
             pageNumber: pageNumber
         )
 
 app.get "/posts/:id", (req, res) ->
     (db.openDoc req.params.id).then (post) ->
-        res.render "post", postToHTML post
+        res.render "post", postsToHTML post
 
 app.post "/posts", (req, res) ->
     post = req.body
@@ -90,17 +90,15 @@ app.post "/posts/:id/comment", (req, res) ->
 ###
 # Helper Functions
 ####
-postToHTML = (posts) ->
-    if (_ posts).isArray()
-        if posts.length > POST_LIMIT
-            posts = (_ posts).last POST_LIMIT
-        (_ posts).reverse()
-        (_ posts).map (post) ->
-            post.value.body = markdown.parse post.value.body
-            timeStamped post.value, DATE_FORMAT_HTML
-    else
-        posts.body = markdown.parse posts.body
-        timeStamped posts, DATE_FORMAT_HTML
+postsToHTML = do ->
+    one = (post) ->
+        post.body = markdown.parse post.body
+        timeStamped post, DATE_FORMAT_HTML
+    many = (posts) ->
+        do (_ posts).reverse
+        posts = (_ posts).first POST_LIMIT
+        (_ posts).map (post) -> one post.value
+    (p) -> if (_ p).isArray() then many p else one p
 
 validPost    = (post)    -> post.title and post.body
 validComment = (comment) -> comment.author and comment.body
@@ -109,7 +107,7 @@ timeStamped = (o = {}, toFormat = (d) -> d) ->
     o.date = toFormat new Date o.date or new Date
     o
 DATE_FORMAT_DB  = (d) -> d.toFormat "MM-DD-YYYY HH24:MI:SS"
-DATE_FORMAT_HTML = (d) -> d.getMonthName() + d.toFormat " DD, YYYY - HH24:MI"
+DATE_FORMAT_HTML = (d) -> d.getMonthName() + d.toFormat " DD, YYYY"
 
 # Start app.
 app.listen 8080

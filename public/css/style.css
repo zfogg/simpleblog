@@ -103,7 +103,7 @@ header {
   max-width: 720px;
 }
 hgroup {
-  padding: 4px 2px 9px 2px;
+  padding: 4px 2px 4px 2px;
 }
 h1 {
   font-size: 28px;
@@ -122,7 +122,7 @@ h2, .post #title input {
 }
 h3, #new-post label {
   color:#666;
-  font:normal 25px/25px "Trebuchet MS",Georgia,Arial,Helvetica;
+  font:normal 20px/20px "Trebuchet MS",Georgia,Arial,Helvetica;
   letter-spacing:-1px;
   text-shadow:0 0 2px #D2D2D2;
   margin:0;
@@ -141,6 +141,21 @@ header h2, header h3 {
   text-align: center;
   padding-bottom: 0.25em;
 }
+p {
+  font-family: Droid Serif, serif;
+  font-size: 1em;
+  line-height: 1.25em;
+  text-align: justify;
+}
+p:first-letter {
+  font-size: 1.8em;
+}
+p + p {
+  text-indent: 2.5em;
+}
+p + p:first-letter {
+  font-size: 1em;
+}
 .post {
   background-color:white;
   box-shadow: 3px 0px 2px #888, -3px 0px 2px #888;
@@ -148,7 +163,7 @@ header h2, header h3 {
   margin: 15px;
 }
 .post .content {
-  margin: 0 10px 10px 10px;
+  margin: 10px 10px 10px 10px;
 }
 .post textarea {
   width: 100%;
@@ -157,14 +172,16 @@ header h2, header h3 {
 }
 .post h2 {
   display: inline-block;
-  margin-right: 12px;
-  margin-bottom: 12px;
-  margin-left: -2px;
+  padding-top: 0.125em;
+}
+.post hgroup h2 {
+  margin-top: 5px;
 }
 .post hgroup h4 {
   display: inline-block;
   float: right;
   margin-top:-5px;
+  margin-right:-3px;
 }
 #new-post #title, #new-post #body {
   line-height: .75em;
