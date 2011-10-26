@@ -171,17 +171,17 @@ p + p:first-letter {
   padding: 0;
 }
 .post h2 {
-  display: inline-block;
-  padding-top: 0.125em;
 }
 .post hgroup h2 {
   margin-top: 5px;
+  padding-top: 0.125em;
 }
 .post hgroup h4 {
-  display: inline-block;
   float: right;
-  margin-top:-5px;
   margin-right:-3px;
+}
+.post .content {
+  clear: both;
 }
 #new-post #title, #new-post #body {
   line-height: .75em;
