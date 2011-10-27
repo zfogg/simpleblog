@@ -33,7 +33,7 @@ app.configure "production", -> app.use express.errorHandler()
 client = couchdb.createClient 5984, "localhost", (user: "simpleblog", password: "5984")
 db     = client.db "simpleblog"
 
-POST_LIMIT    = 5
+POST_LIMIT = 5
 
 ###
 # Routes
@@ -86,6 +86,13 @@ app.post "/posts/:id/comment", (req, res) ->
 
         (db.saveDoc post).then () ->
             res.redirect "/posts/"+id
+
+app.get "/canvas/:script", (req, res) ->
+    script = req.params.script
+    res.render "canvas", (
+        title: script
+        script: script
+    )
 
 ###
 # Helper Functions

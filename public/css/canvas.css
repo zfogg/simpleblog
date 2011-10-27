@@ -1,0 +1,79 @@
+body {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#canvas-container {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  display: block;
+}
+
+canvas {
+  position: absolute;
+  margin: 0 auto;
+  display: block;
+}
+
+#canvas-controls-container {
+  display: none;
+  position: absolute;
+  left: -15px;
+  top: -40px;
+
+  font-weight: bold;
+  line-height: 0.15em;
+  font-size: 10px;
+}
+
+#canvas-controls-container a {
+  cursor: pointer;
+}
+
+#canvas-controls-container h3, #canvas-controls-container p {
+  cursor: default;
+}
+
+#canvas-controls {
+  display: none;
+  background: rgba(170, 170, 170, 0.85);
+  padding: 0.55em;
+  margin: 40px 0.75em 0.75em;
+  border-radius: 4px;
+  box-shadow: 3px 3px 6px rgb(50, 50, 90),
+              -4px -4px 12px rgb(110, 140, 150);
+
+  font-family: Tahoma, serif;
+}
+
+#canvas-controls input {
+  border: solid 1px rgb(133, 177, 222);
+  background-color: rgba(237, 242, 247, 0.55);
+
+  width: 110px;
+  display: block;
+  margin: 2px auto 2px auto;
+  padding: 4px;
+  
+  -moz-user-select: text;
+  -khtml-user-select: text;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+#canvas-controls input[type=text] {
+  box-shadow: inset 0 -1px 6px #222222;
+}
+
+#canvas-controls input[type=button] {
+  padding: 6px;
+  margin-top: 7px;
+  display: block;
+
+  border-radius: 8px;
+  box-shadow: inset 2px 2px 4px rgb(50, 50, 90),
+              inset -2px -2px 4px rgb(110, 140, 150);
+}
