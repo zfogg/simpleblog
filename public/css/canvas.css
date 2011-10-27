@@ -33,13 +33,18 @@ canvas {
   cursor: pointer;
 }
 
+#canvas-controls-container p {
+  color: white;
+  text-shadow: 2px 0 3px black;
+}
+
 #canvas-controls-container h3, #canvas-controls-container p {
   cursor: default;
 }
 
 #canvas-controls {
   display: none;
-  background: rgba(170, 170, 170, 0.85);
+  background: rgba(0, 0, 0, 0.85);
   padding: 0.55em;
   margin: 40px 0.75em 0.75em;
   border-radius: 4px;
@@ -51,13 +56,13 @@ canvas {
 
 #canvas-controls input {
   border: solid 1px rgb(133, 177, 222);
-  background-color: rgba(237, 242, 247, 0.55);
+  background-color: rgba(255, 255, 255, 0.75);
 
   width: 110px;
   display: block;
   margin: 2px auto 2px auto;
   padding: 4px;
-  
+
   -moz-user-select: text;
   -khtml-user-select: text;
   -webkit-user-select: text;

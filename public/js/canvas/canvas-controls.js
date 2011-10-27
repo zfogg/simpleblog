@@ -46,7 +46,7 @@ function CanvasControls() {
         return button;
     };
 
-    this.controlLimiter = function(limit) {
+    this.controlLimit = function(limit) {
         return function(e) {
             this.value = Math.clipValues(this.value, limit.lower, limit.upper);
         };

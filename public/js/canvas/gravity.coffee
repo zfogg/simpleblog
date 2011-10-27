@@ -97,7 +97,7 @@ Gravity = (canvas) ->
   applyGravity = (b1, b2) ->
     f = attractionOfGravity b1, b2
     b1.applyForce f
-    b2.applyForce Math.negateVector2 f
+    b2.applyForce (x: -f.x, y: -f.y)
 
   forceTowards = (from, to, coEf) ->
     coEf or= 1
@@ -117,85 +117,96 @@ Gravity = (canvas) ->
 
   gravity = (G, m1, m2, r) -> G*m1*m2 / r*r
 
+  hypotenuseLookup = (digits, maxSquare) ->
+    sqrtTable = do ->
+        pow = Math.pow 10, digits
+        sqrts = (Math.sqrt x for x in [0 .. maxSquare * pow] by 1.0 / pow)
+        (n) -> sqrts[(n / 100 * pow) | 0]
+    (a, b) -> sqrtTable (a*a + b*b)
+
   do ->
-     controls           = new CanvasControls
-     gravityModifier    = 1000000
-     frictionModifier   = 10000
-     distanceModifier   = 1
-     gravityLimit       = lower: 0, upper: 100
-     frictionLimit      = lower: 0.25, upper: 15
-     distanceLimit      = lower: 0.25, upper: 15
+    controls         = new CanvasControls
+    gravityModifier  = 1000000
+    frictionModifier = 10000
+    distanceModifier = 1
+    gravityLimit     = lower: 0, upper: 100
+    frictionLimit    = lower: 0.25, upper: 15
+    distanceLimit    = lower: 0.25, upper: 15
 
-     gravityControl = controls.NumberInput(
-       "gravitational Attraction", currentGravity.value * gravityModifier
-       "oninput", controls.controlLimit gravityLimit
-     )
-     gravityControl.onchange = controls.propertyUpdater currentGravity, "value", gravityModifier
+    gravityControl = controls.NumberInput(
+      "Gravitational Attraction", currentGravity.value * gravityModifier
+      "oninput", controls.controlLimit gravityLimit
+    )
+    gravityControl.onchange = controls.propertyUpdater currentGravity, "value", gravityModifier
 
-     frictionControl = controls.NumberInput(
-       "Atmospheric Friction", (Math.floor currentFriction.value * frictionModifier * 100) / 100,
-       "oninput", controls.controlLimit frictionLimit
-     )
-     frictionControl.onchange = controls.propertyUpdater currentFriction, "value", frictionModifier
+    frictionControl = controls.NumberInput(
+      "Atmospheric Friction", (Math.floor currentFriction.value * frictionModifier * 100) / 100,
+      "oninput", controls.controlLimit frictionLimit
+    )
+    frictionControl.onchange = controls.propertyUpdater currentFriction, "value", frictionModifier
 
-     distanceControl = controls.NumberInput(
-       "Gravity Deadzone Radius", currentDistance.value * distanceModifier,
-       "oninput", controls.controlLimit distanceLimit
-     )
-     distanceControl.onchange = controls.propertyUpdater currentDistance, "value", distanceModifier
+    distanceControl = controls.NumberInput(
+      "Gravity Deadzone Radius", currentDistance.value * distanceModifier,
+      "oninput", controls.controlLimit distanceLimit
+    )
+    distanceControl.onchange = controls.propertyUpdater currentDistance, "value", distanceModifier
 
-     cursorFrictionControl = controls.NumberInput(
-       "Cursor Friction Coefficient", 25,
-       "oninput", controls.controlLimit lower: 0, upper: 100
-     )
+    cursorFrictionControl = controls.NumberInput(
+      "Cursor Friction Coefficient", 25,
+      "oninput", controls.controlLimit (lower: 0, upper: 100)
+    )
 
-     cursorMassControl = controls.NumberInput(
-       "Cursor Body Mass", 2500,
-       "oninput", controls.controlLimit lower: 0, upper: 10 * 1000
-     )
+    cursorMassControl = controls.NumberInput(
+      "Cursor Body Mass", 2500,
+      "oninput", controls.controlLimit (lower: 0, upper: 10 * 1000)
+    )
 
-     cursorReleaseForceControl = controls.NumberInput(
-       "Cursor Release Force", 0.75,
-       "oninput", controls.controlLimit lower: -5, upper: 5
-     )
+    cursorReleaseForceControl = controls.NumberInput(
+      "Cursor Release Force", 0.75,
+      "oninput", controls.controlLimit (lower: -5, upper: 5)
+    )
 
-     particleCountControl = controls.NumberInput(
-         "Particle Count", 400,
-         "oninput", controls.controlLimit
+    defaultButton = controls.ButtonInput(
+      "Defaults Values", "onclick", (e) ->
+        do gravityControl.reset
+        do frictionControl.reset
+        do distanceControl.reset
+        do cursorMassControl.reset
+        do cursorMassControl.reset
+        do cursorFrictionControl.reset
+        do cursorReleaseForceControl.reset
+    )
 
-     resetButton = controls.ButtonInput(
-       "Reset / Defaults", "onclick", (e) ->
-         do gravityControl.reset
-         do frictionControl.reset
-         do distanceControl.reset
-         do cursorMassControl.reset
-         do cursorMassControl.reset
-         do cursorFrictionControl.reset
-         do cursorReleaseForceControl.reset
-         do resetSquares
-     )
+    particleCountControl = controls.NumberInput(
+      "Rows of Squares", 16,
+      "oninput", controls.controlLimit (lower: 1, upper: 80)
+    )
 
-     mouseDown = ->
-       cursorBody.mass = cursorMassControl.value
-       currentFriction.value = frictionControl.value/frictionModifier * cursorFrictionControl.value
-       currentGravity.value = gravityControl.value/gravityModifier
+    resetButton = controls.ButtonInput(
+      "Reset Squares", "onclick", (e) -> resetSquares particleCountControl.value
+    )
 
-     mouseUp = ->
-       squares.forEach (s) ->
-         if 75 > Math.distance s.position, cursorBody.position
-           s.applyForce forceTowards s.position, cursorBody.position, cursorReleaseForceControl.value
 
-       currentFriction.value = frictionControl.value/frictionModifier
-       currentGravity.value = gravityControl.value/gravityModifier
-       cursorBody.mass = 0
+    mouseDown = ->
+      cursorBody.mass = cursorMassControl.value
+      currentFriction.value = frictionControl.value/frictionModifier * cursorFrictionControl.value
+      currentGravity.value = gravityControl.value/gravityModifier
 
-     canvas.addEventListener "mousemove", cursorUpdater cursor, canvas, false
-     canvas.addEventListener "mousedown", mouseDown, false
-     canvas.addEventListener "mouseup", mouseUp, false
+    mouseUp = ->
+      squares.forEach (s) ->
+        if 75 > Math.distance s.position, cursorBody.position
+          s.applyForce forceTowards s.position, cursorBody.position, cursorReleaseForceControl.value
+      currentFriction.value = frictionControl.value/frictionModifier
+      currentGravity.value = gravityControl.value/gravityModifier
+      cursorBody.mass = 0
 
-  resetSquares = -> squares = constructSquares 20, 28, 5
-  hypotenuse = zHypotenuse 3, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
-  do resetSquares
+    canvas.addEventListener "mousemove", cursorUpdater cursor, canvas, false
+    canvas.addEventListener "mousedown", mouseDown, false
+    canvas.addEventListener "mouseup", mouseUp, false
+
+  resetSquares = (n) -> squares = constructSquares n, n, 5
+  hypotenuse = hypotenuseLookup 3, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
+  resetSquares 16
   do main
 
 window.onload = ->
