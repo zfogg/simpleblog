@@ -143,17 +143,17 @@ header h2, header h3 {
 }
 p {
   font-family: Droid Serif, serif;
-  font-size: 1em;
+  font-size: 1.125em;
   line-height: 1.25em;
   text-align: justify;
 }
-p:first-letter {
+.post p:first-letter {
   font-size: 1.8em;
 }
-p + p {
+.post p + p {
   text-indent: 2.5em;
 }
-p + p:first-letter {
+.post p + p:first-letter {
   font-size: 1em;
 }
 .post {

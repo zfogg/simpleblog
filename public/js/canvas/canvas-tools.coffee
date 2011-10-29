@@ -1,6 +1,6 @@
 # Maths
 
-Math.direction = (p1, p2) -> (x: p1.x - p2.x, y: p1.y - p2.y)
+Math.direction = (p1, p2) -> new Vector2 p1.x - p2.x, p1.y - p2.y
 
 Math.hypotenuse = (a, b) -> Math.sqrt a*a + b*b
 
@@ -15,6 +15,15 @@ Math.clipValues = (value, lower, upper) ->
         value
     else
         value < lower ? lower : upper
+
+class Vector2
+  constructor: (@x = 0, @y = 0) ->
+
+  add: (v2) ->
+    @x += v2.x
+    @y += v2.y
+
+  Unit: (n = 1) -> new Vector2 n, n
 
 #
 # Assorted helper functions

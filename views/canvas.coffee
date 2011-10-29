@@ -3,9 +3,6 @@ header -> h2 @title
 div "#canvas-container", ->
     link rel: "stylesheet", href: "/css/canvas.css"
     canvas id: "canvas"
-    script src: "/js/canvas/canvas-tools.js"
-    script src: "/js/canvas/canvas-controls.js"
-    script src: "/js/canvas/#{@title}.js"
 
     div "#canvas-controls-container", ->
         div id: "canvas-controls"
@@ -13,3 +10,6 @@ div "#canvas-container", ->
             a "Show"
             text " controls."
 
+    script src: "/js/canvas/canvas-tools.js"
+    script src: "/js/canvas/canvas-controls.js"
+    script src: "/js/canvas/#{@title}.js"

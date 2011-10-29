@@ -26,7 +26,7 @@ app.configure ->
 
 app.configure "development", ->
     app.use express.errorHandler (dumbExceptions: true, showStack: true)
-    app.use express.logger (format: ":method :referrer --> :url")
+    app.use express.logger (format: ":remote-addr # :method :referrer --> :url")
 
 app.configure "production", -> app.use express.errorHandler()
 
@@ -117,4 +117,4 @@ DATE_FORMAT_DB  = (d) -> d.toFormat "MM-DD-YYYY HH24:MI:SS"
 DATE_FORMAT_HTML = (d) -> d.getMonthName() + d.toFormat " DD, YYYY"
 
 # Start app.
-app.listen 8080
+app.listen 5643
