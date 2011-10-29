@@ -20,9 +20,9 @@ class CanvasControls
         numberInput = @inputElement "number", defaultValue
         numberInput[eventType] = event if event
 
-        numberInput.reset = ->
-            @value = defaultValue
-            @onchange() if @onchange
+        @resets.push ->
+            numberInput.value = defaultValue
+            numberInput.onchange() if numberInput.onchange
 
         numberInput
 
@@ -37,6 +37,9 @@ class CanvasControls
 
     propertyUpdater: (obj, objProperty, modifier) ->
         -> obj[objProperty] = @value / (modifier or 1)
+
+
+    resets: []
 
 ($ document).ready ->
     ($ "#canvas-controls-container").show()
