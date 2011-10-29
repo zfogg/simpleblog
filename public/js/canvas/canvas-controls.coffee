@@ -43,10 +43,10 @@ class CanvasControls
 
 ($ document).ready ->
     ($ "#canvas-controls-container").show()
-    toggleText = (text, first, second) -> if text.indexOf first then first else second
     ($ "#toggle-menu a").mousedown (event) ->
         if event.which is 1
             ($ "#canvas-controls").slideToggle "slow"
-            ($ "#togle-menu a").text(
-                toggleText ($ "#toggle-menu a").text(), "Hide", "Show"
-            )
+            if (($ "#toggle-menu a").text().indexOf "Show") is -1
+              ($ "#toggle-menu a").text "Show"
+            else
+              ($ "#toggle-menu a").text "Hide"

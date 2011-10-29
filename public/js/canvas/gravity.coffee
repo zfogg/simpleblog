@@ -1,15 +1,15 @@
 Gravity = (canvas) ->
-  ctx = canvas.getContext "2d"
-  gameTime = 0
-  squares = []
+  ctx             = canvas.getContext  "2d"
+  gameTime        = 0
+  squares         = []
 
   defaultGravity  = 6.67 * (Math.pow 10, -11) * 100000
   defaultFriction = 0.000115
   defaultDistance = Math.PI
 
-  currentGravity  = { value: defaultGravity }
-  currentFriction = { value: defaultFriction }
-  currentDistance = { value: defaultDistance }
+  currentGravity  = value: defaultGravity
+  currentFriction = value: defaultFriction
+  currentDistance = value: defaultDistance
 
   class PhysicalBody
     constructor: (@position = new Vector2, @mass = 1, @size = 1, @restitution = 1, @velocity = new Vector2) ->
@@ -27,10 +27,7 @@ Gravity = (canvas) ->
       @applyForce attractionOfGravity @, cursor
       @bounceOffLimits canvas.width, canvas.height, @mass*2
       do @updatePosition
-
-      # Decay velocity for an 'arcade' feel.
-      @decayVelocity currentFriction.value
-
+      @decayVelocity currentFriction.value # Less real, more fun.
       do @draw
 
     decayVelocity: (n) ->
