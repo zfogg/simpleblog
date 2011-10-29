@@ -56,23 +56,73 @@ Gravity = (canvas) ->
 
   class Cursor extends PhysicalBody
     constructor: ->
+      @position = new Vector2
+      @trackedPosition = new Vector2
       canvas.addEventListener "mousedown", @mouseDown, false
+      canvas.addEventListener "mousedown", @leftDown, false
+      canvas.addEventListener "mousedown", @middleDown, false
       canvas.addEventListener "mouseup", @mouseUp, false
+      canvas.addEventListener "mouseup", @allUp, false
+      canvas.addEventListener "mousemove", cursorUpdater @trackedPosition, canvas, false
       super
 
-    mouseDown: => @mass = cursorMassControl.value
+    isClicked:
+      left:   false
+      middle: false
+      right:  false
 
-    mouseUp: =>
+    middleDown: =>
+      if @isClicked.middle
+        @mass = cursorMassControl.value / 2
+        currentFriction.value = 0.5 * frictionControl.value/frictionModifier * cursorFrictionControl.value
+
+    middleHeldDown: =>
+      @position.add new Vector2(
+        (Math.sin gameTime*8 / 45) * 4,
+        (Math.cos gameTime*8 / 45) * 4
+      )
+
+    leftDown: =>
+      if @isClicked.left
+        @mass = cursorMassControl.value
+        currentFriction.value = frictionControl.value/frictionModifier * cursorFrictionControl.value
+        currentGravity.value = gravityControl.value/gravityModifier
+
+    allUp: =>
       squares.forEach (s) =>
         if 75 > Math.distance s.position, @position
           s.applyForce forceTowards s.position, @position, cursorReleaseForceControl.value
       @mass = 0
+      currentFriction.value = frictionControl.value/frictionModifier
+      currentGravity.value = gravityControl.value/gravityModifier
+
+    toggleClicks: (e, value) ->
+      switch e.which
+        when 1 then @isClicked.left = value
+        when 2 then @isClicked.middle = value
+        when 3 then @isClicked.right = value
+
+    mouseDown: (e) =>
+      @toggleClicks e, true
+
+    mouseUp: (e) =>
+      @toggleClicks e, false
+
+    updatePosition: ->
+      @position.x = @trackedPosition.x
+      @position.y = @trackedPosition.y
+
+    update: ->
+      if @isClicked.middle
+        do @middleHeldDown
+      else
+        do @updatePosition
 
   main = ->
     clearCanvas canvas, ctx
-    cursor.updatePosition cursor
+    do cursor.update
 
-    applyFunctionToUniquePairs applyGravity, squares
+    mapOverUniquePairs applyGravity, squares
     square.update gameTime for square in squares
 
     gameTime++
@@ -85,12 +135,9 @@ Gravity = (canvas) ->
   initPositions = (rows, columns) ->
     positions = []
     position = (x, y) -> new Vector2 x * canvas.width / columns, y * canvas.height / rows
-    for x in [0 .. columns]
-      for y in [0 .. rows]
-        positions.push position x, y
-    positions
+    (position (n / rows) | 0, n % rows for n in [0..rows*columns])
 
-  applyFunctionToUniquePairs = (f, set) ->
+  mapOverUniquePairs = (f, set) ->
     i = set.length
     while j = --i
       while j--
@@ -137,25 +184,22 @@ Gravity = (canvas) ->
   gravityModifier  = 1000000
   frictionModifier = 10000
   distanceModifier = 1
-  gravityLimit     = lower: 0, upper: 100
-  frictionLimit    = lower: 0.25, upper: 15
-  distanceLimit    = lower: 0.25, upper: 15
 
   gravityControl = controls.NumberInput(
     "Gravitational Attraction", currentGravity.value * gravityModifier
-    "oninput", controls.controlLimit gravityLimit
+    "oninput", controls.controlLimit (lower: 0, upper: 100)
   )
   gravityControl.onchange = controls.propertyUpdater currentGravity, "value", gravityModifier
 
   frictionControl = controls.NumberInput(
     "Atmospheric Friction", (Math.floor currentFriction.value * frictionModifier * 100) / 100,
-    "oninput", controls.controlLimit frictionLimit
+    "oninput", controls.controlLimit (lower: 0.25, upper: 15)
   )
   frictionControl.onchange = controls.propertyUpdater currentFriction, "value", frictionModifier
 
   distanceControl = controls.NumberInput(
     "Gravity Deadzone Radius", currentDistance.value * distanceModifier,
-    "oninput", controls.controlLimit distanceLimit
+    "oninput", controls.controlLimit (lower: 0.25, upper: 15)
   )
   distanceControl.onchange = controls.propertyUpdater currentDistance, "value", distanceModifier
 
@@ -175,14 +219,7 @@ Gravity = (canvas) ->
   )
 
   defaultButton = controls.ButtonInput(
-    "Defaults Values", "onclick", (e) ->
-      do gravityControl.reset
-      do frictionControl.reset
-      do distanceControl.reset
-      do cursorMassControl.reset
-      do cursorMassControl.reset
-      do cursorFrictionControl.reset
-      do cursorReleaseForceControl.reset
+    "Defaults Values", "onclick", -> controls.resets.forEach (x) -> x()
   )
 
   particleCountControl = controls.NumberInput(
@@ -193,18 +230,6 @@ Gravity = (canvas) ->
   resetButton = controls.ButtonInput(
     "Reset Squares", "onclick", (e) -> resetSquares particleCountControl.value
   )
-
-  mouseDown = ->
-    currentFriction.value = frictionControl.value/frictionModifier * cursorFrictionControl.value
-    currentGravity.value = gravityControl.value/gravityModifier
-
-  mouseUp = ->
-    currentFriction.value = frictionControl.value/frictionModifier
-    currentGravity.value = gravityControl.value/gravityModifier
-
-  canvas.addEventListener "mousemove", cursorUpdater cursor.position, canvas, false
-  canvas.addEventListener "mousedown", mouseDown, false
-  canvas.addEventListener "mouseup", mouseUp, false
 
   do main
 
