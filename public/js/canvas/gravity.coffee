@@ -25,7 +25,8 @@ Gravity = (canvas) ->
 
     update: (gameTime) ->
       @applyForce attractionOfGravity @, cursor
-      @bounceOffLimits canvas.width, canvas.height, @mass*2
+      unless cursor.isClicked.right or cursor.isClicked.left
+        @bounceOffLimits canvas.width, canvas.height, @mass*2
       do @updatePosition
       @decayVelocity currentFriction.value # Less real, more fun.
       do @draw
@@ -55,12 +56,14 @@ Gravity = (canvas) ->
     constructor: ->
       @position = new Vector2
       @trackedPosition = new Vector2
-      canvas.addEventListener "mousedown", @mouseDown, false
-      canvas.addEventListener "mousedown", @leftDown, false
-      canvas.addEventListener "mousedown", @middleDown, false
-      canvas.addEventListener "mouseup", @mouseUp, false
-      canvas.addEventListener "mouseup", @allUp, false
-      canvas.addEventListener "mousemove", cursorUpdater @trackedPosition, canvas, false
+      @canvasCenter = new Vector2 canvas.width / 2, canvas.height / 2
+
+      ($ "#canvas").mousedown @toggleDown
+      ($ "#canvas").mousedown @mouseDown
+      ($ "body").mouseup      @toggleUp
+      ($ "body").mouseup      @mouseUp
+
+      canvas.addEventListener "mousemove", (cursorUpdater @trackedPosition, canvas), false
       super
 
     isClicked:
@@ -68,52 +71,66 @@ Gravity = (canvas) ->
       middle: false
       right:  false
 
-    middleDown: =>
-      if @isClicked.middle
-        @mass = cursorMassControl.value / 2
-        currentFriction.value = 0.5 * frictionControl.value/frictionModifier * cursorFrictionControl.value
-
-    middleHeldDown: =>
-      @position.add new Vector2(
-        (Math.sin gameTime*8 / 45) * 4,
-        (Math.cos gameTime*8 / 45) * 4
-      )
-
-    leftDown: =>
-      if @isClicked.left
-        @mass = cursorMassControl.value
-        currentFriction.value = frictionControl.value/frictionModifier * cursorFrictionControl.value
-        currentGravity.value = gravityControl.value/gravityModifier
-
-    allUp: =>
-      squares.forEach (s) =>
-        if 75 > Math.distance s.position, @position
-          s.applyForce forceTowards s.position, @position, cursorReleaseForceControl.value
-      @mass = 0
-      currentFriction.value = frictionControl.value/frictionModifier
-      currentGravity.value = gravityControl.value/gravityModifier
-
+    toggleDown: (e) => @toggleClicks e, true
+    toggleUp:   (e) => @toggleClicks e, false
     toggleClicks: (e, value) ->
       switch e.which
         when 1 then @isClicked.left = value
         when 2 then @isClicked.middle = value
         when 3 then @isClicked.right = value
 
-    mouseDown: (e) =>
-      @toggleClicks e, true
+    mouseDown: =>
+      if @isClicked.left
+        @mass = cursorMassControl.value
+        currentFriction.value = frictionControl.value/frictionModifier * cursorFrictionControl.value
+        currentGravity.value = gravityControl.value/gravityModifier
 
-    mouseUp: (e) =>
-      @toggleClicks e, false
+      else if @isClicked.right
+        @mass = cursorMassControl.value
+        currentFriction.value = 0.2 * (frictionControl.value/frictionModifier * cursorFrictionControl.value)
+        currentGravity.value = gravityControl.value/gravityModifier
+
+      else if @isClicked.right
+        null
+
+    mouseUp: =>
+      unless @isClicked.left
+        squares.forEach (s) =>
+          if 75 > Math.distance s.position, @position
+            s.applyForce forceTowards s.position, @position, cursorReleaseForceControl.value
+        @mass = 0
+        currentFriction.value = frictionControl.value/frictionModifier
+        currentGravity.value = gravityControl.value/gravityModifier
+
+      unless @isClicked.middle
+        null
+
+      unless @isClicked.right
+        null
+
+    rightHeldDown: =>
+      @position = @canvasCenter.clone()
+      @position.add new Vector2(
+        (Math.sin gameTime / 10) * 84,
+        (Math.cos gameTime / 10) * 84
+      )
+      do @draw
 
     updatePosition: ->
       @position.x = @trackedPosition.x
       @position.y = @trackedPosition.y
 
     update: ->
-      if @isClicked.middle
-        do @middleHeldDown
+      if @isClicked.right
+        do @rightHeldDown
       else
         do @updatePosition
+
+    draw: ->
+      do ctx.beginPath
+      ctx.arc @position.x, @position.y, 10, 0, Math.PI*2, true
+      do ctx.closePath
+      do ctx.fill
 
   main = ->
     clearCanvas canvas, ctx
@@ -130,7 +147,6 @@ Gravity = (canvas) ->
     newSquare position, index for position, index in initPositions rows, columns
 
   initPositions = (rows, columns) ->
-    positions = []
     position = (x, y) -> new Vector2 x * canvas.width / columns, y * canvas.height / rows
     (position (n / rows) | 0, n % rows for n in [0..rows*columns])
 
@@ -171,7 +187,7 @@ Gravity = (canvas) ->
         (n) -> sqrts[(n / 100 * pow) | 0] or Math.sqrt n
     (a, b) -> sqrtTable (a*a + b*b)
 
-  resetSquares = (n) -> squares = constructSquares n, n, 5
+  resetSquares = (n) -> squares = constructSquares n, n, (Math.randomBetween 3, 6)
   hypotenuse = hypotenuseLookup 3, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
   cursor = new Cursor
   resetSquares 16

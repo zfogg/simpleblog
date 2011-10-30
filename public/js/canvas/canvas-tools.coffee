@@ -14,7 +14,7 @@ Math.clipValues = (value, lower, upper) ->
     if value >= lower and value <= upper
         value
     else
-        value < lower ? lower : upper
+        if value < lower then lower else upper
 
 class Vector2
   constructor: (@x = 0, @y = 0) ->
@@ -22,6 +22,8 @@ class Vector2
   add: (v2) ->
     @x += v2.x
     @y += v2.y
+
+  clone: -> new Vector2 @x, @y
 
   Unit: (n = 1) -> new Vector2 n, n
 

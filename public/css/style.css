@@ -65,6 +65,9 @@ td { vertical-align: top; }
    Author: Z. Fogg
    ========================================================================== */
 
+html {
+  height: 100%;
+}
 body:before {
   content: "";
   position: fixed;
@@ -83,9 +86,10 @@ body {
   padding:0;
 }
 #container {
-  min-height: 100%;
+  height: 100%;
   margin: 0 auto;
   max-width: 80em;
+
 }
 header {
   font:normal 24px/24px "Trebuchet MS",Georgia,Arial,Helvetica;

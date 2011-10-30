@@ -2,7 +2,7 @@ header -> h2 @title
 
 div "#canvas-container", ->
     link rel: "stylesheet", href: "/css/canvas.css"
-    canvas id: "canvas"
+    canvas id: "canvas", oncontextmenu: "return false;"
 
     div "#canvas-controls-container", ->
         div id: "canvas-controls"
