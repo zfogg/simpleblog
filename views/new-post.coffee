@@ -1,7 +1,8 @@
 header -> h2 "New Post"
 
 div "#main", -> 
-    h3 -> a href: "/posts", "Home"
+    h3 style: "margin-top:-50px; margin-bottom:50px;", ->
+        a href: "/posts", "Home"
     div "post", ->
         form id: "new-post", method: "post", action: "/posts", ->
             fieldset ->

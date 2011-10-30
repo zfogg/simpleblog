@@ -2,7 +2,8 @@ header ->
     h2 "simpleblog"
 
 div "#main", ->
-    h3 -> a href: "/posts/new", -> "New Post"
+    h3 style: "margin-top:-50px; margin-bottom:50px;", ->
+        a href: "/posts/new", -> "New Post"
     for post in @posts
         div "post", ->
             hgroup ->

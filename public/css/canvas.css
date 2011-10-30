@@ -21,7 +21,7 @@ canvas {
   display: none;
   position: absolute;
   left: -15px;
-  top: -40px;
+  top: -60px;
 
   font-weight: bold;
   line-height: 0.15em;
@@ -80,4 +80,9 @@ canvas {
   border-radius: 8px;
   box-shadow: inset 2px 2px 4px rgb(50, 50, 90),
               inset -2px -2px 4px rgb(110, 140, 150);
+}
+
+#toggle-menu a {
+  text-transform: capitalize;
+  text-decoration: underline;
 }

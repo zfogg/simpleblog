@@ -1,75 +1,8 @@
-/* HTML5 ✰ Boilerplate
- * ==|== normalize ==========================================================
- */
-
-article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
-audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
-audio:not([controls]) { display: none; }
-[hidden] { display: none; }
-
-html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-body { margin: 0; font-size: 13px; line-height: 1.231; }
-body, button, input, select, textarea { font-family: sans-serif; color: #222; }
-
-::-moz-selection { background: #fe57a1; color: #fff; text-shadow: none; }
-::selection { background: #fe57a1; color: #fff; text-shadow: none; }
-
-a { color: #00e; }
-a:visited { color: #551a8b; }
-a:hover { color: #06e; }
-a:focus { outline: thin dotted; }
-a:hover, a:active { outline: 0; }
-
-abbr[title] { border-bottom: 1px dotted; }
-b, strong { font-weight: bold; }
-blockquote { margin: 1em 40px; }
-dfn { font-style: italic; }
-hr { display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin: 1em 0; padding: 0; }
-ins { background: #ff9; color: #000; text-decoration: none; }
-mark { background: #ff0; color: #000; font-style: italic; font-weight: bold; }
-pre, code, kbd, samp { font-family: monospace, monospace; _font-family: 'courier new', monospace; font-size: 1em; }
-pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; }
-q { quotes: none; }
-q:before, q:after { content: ""; content: none; }
-small { font-size: 85%; }
-sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
-sup { top: -0.5em; }
-sub { bottom: -0.25em; }
-ul, ol { margin: 1em 0; padding: 0 0 0 40px; }
-dd { margin: 0 0 0 40px; }
-nav ul, nav ol { list-style: none; list-style-image: none; margin: 0; padding: 0; }
-img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }
-svg:not(:root) { overflow: hidden; }
-figure { margin: 0; }
-
-form { margin: 0; }
-fieldset { border: 0; margin: 0; padding: 0; }
-label { cursor: pointer; }
-legend { border: 0; *margin-left: -7px; padding: 0; }
-button, input, select, textarea { font-size: 100%; margin: 0; vertical-align: baseline; *vertical-align: middle; }
-button, input { line-height: normal; *overflow: visible; }
-table button, table input { *overflow: auto; }
-button, input[type="button"], input[type="reset"], input[type="submit"] { cursor: pointer; -webkit-appearance: button; }
-input[type="checkbox"], input[type="radio"] { box-sizing: border-box; }
-input[type="search"] { -webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; }
-input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
-button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
-textarea { overflow: auto; vertical-align: top; }
-input:valid, textarea:valid {  }
-input:invalid, textarea:invalid { background-color: #f0dddd; }
-
-table { border-collapse: collapse; border-spacing: 0; }
-td { vertical-align: top; }
-
-/* ==|== primary styles =====================================================
-   Author: Z. Fogg
-   ========================================================================== */
-
 html {
   height: 100%;
 }
 body:before {
-  content: "";
+  content: '';
   position: fixed;
   top: -10px;
   left: 0;
@@ -81,35 +14,25 @@ body:before {
 body {
   height: 100%;
   background-color: rgb(245, 245, 245);
-  color:#222;
-  padding: 50px;
-  padding:0;
+  color: #222;
+  padding: 0;
 }
 #container {
   height: 100%;
   margin: 0 auto;
-  max-width: 80em;
-
+  max-width: 72em;
+  min-width: 32em;
 }
 header {
-  font:normal 24px/24px "Trebuchet MS",Georgia,Arial,Helvetica;
-  text-shadow:0 0 3px #444,2px 2px 3px #bbb;
-  padding:40px 0 15px 0;
+  padding: 40px 0 15px 0;
   margin: 0 25px 0 25px;
   box-shadow: 0 4px 2px -2px gray;
 }
-#main {
-  font-face:"Trebuchet MS",Georgia,Arial,Helvetica;
-  color:#222;
-  padding: 50px 25px -35px 25px;
-  margin: 20px auto;
-  min-width: 400px;
-  max-width: 720px;
+header h2 {
+  text-align: center;
+  padding-bottom: 0.25em;
 }
-hgroup {
-  padding: 4px 2px 4px 2px;
-}
-h1 {
+body h1 {
   font-size: 28px;
   line-height: 108%;
   letter-spacing: 0.15em;
@@ -117,39 +40,63 @@ h1 {
   font-variant: small-caps;
   text-shadow: 2px 1px 3px #2f4f4f;
 }
-h2, .post #title input {
-  color:#515151;
-  font:bold 26px/28px "Trebuchet MS",Georgia,Arial,Helvetica;
-  letter-spacing:-1px;
-  text-shadow:3px 2px 3px #b8b8b8;
-  margin:0;
+h1 a {
+  color: #515151;
+  border: 0;
 }
-h3, #new-post label {
-  color:#666;
-  font:normal 20px/20px "Trebuchet MS",Georgia,Arial,Helvetica;
-  letter-spacing:-1px;
-  text-shadow:0 0 2px #D2D2D2;
-  margin:0;
-  padding:0 2px 0 4px;
+h1 a:visited {
+  color: #515151;
+  border: 0;
+}
+body h2 {
+  color: #515151;
+  font: bold 26px/28px "Trebuchet MS",Georgia,Arial,Helvetica;
+  letter-spacing: -1px;
+  text-shadow: 3px 2px 3px #b8b8b8;
+  margin: 0;
+}
+h2 a {
+  color: #515151;
+  border: 0;
+}
+h2 a:visited {
+  color: #515151;
+  border: 0;
+}
+body h3 {
+  color: #666;
+  font: normal 20px/20px "Trebuchet MS",Georgia,Arial,Helvetica;
+  letter-spacing: -1px;
+  text-shadow: 0 0 2px #D2D2D2;
+  padding: 0.4em 0.2em 0.4em 0.24em;
+}
+h3 a {
+  color: #515151;
+  border: 0;
+}
+h3 a:visited {
+  color: #515151;
+  border: 0;
 }
 h4 {
   color: #515151;
   margin: 0;
   padding: 0.2em 0 0.1em 0;
 }
-h2 a, h2 a:visited, h3 a, h3 a:visited h4 a:visited {
-  color:#515151; border:0;
-}
-h2 a:hover, h3 a:hover { color:#000; }
-header h2, header h3 {
-  text-align: center;
-  padding-bottom: 0.25em;
-}
-p {
+body p {
   font-family: Droid Serif, serif;
   font-size: 1.125em;
-  line-height: 1.25em;
+  line-height: 1.45em;
   text-align: justify;
+}
+p a {
+  color: #00B7FF;
+}
+.post {
+  background-color: white;
+  box-shadow: 3px 0px 2px #888, -3px 0px 2px #888;
+  padding: 12px;
+  margin: 15px;
 }
 .post p:first-letter {
   font-size: 1.8em;
@@ -160,34 +107,42 @@ p {
 .post p + p:first-letter {
   font-size: 1em;
 }
-.post {
-  background-color:white;
-  box-shadow: 3px 0px 2px #888, -3px 0px 2px #888;
-  padding: 12px;
-  margin: 15px;
-}
 .post .content {
-  margin: 10px 10px 10px 10px;
+  clear: both;
 }
 .post textarea {
   width: 100%;
   margin: 3px 0 7px 0;
   padding: 0;
 }
-.post h2 {
+.post hgroup {
+  padding: 4px 2px 4px 2px;
 }
 .post hgroup h2 {
   margin-top: 5px;
   padding-top: 0.125em;
+  display: inline-block;
 }
 .post hgroup h4 {
   float: right;
-  margin-right:-3px;
+  display: inline-block;
+  margin-right: -3px;
 }
-.post .content {
-  clear: both;
+.post #title input {
+  color: #515151;
+  font: bold 26px/28px "Trebuchet MS",Georgia,Arial,Helvetica;
+  letter-spacing: -1px;
+  text-shadow: 3px 2px 3px #b8b8b8;
+  margin: 0;
 }
-#new-post #title, #new-post #body {
+.post label {
+  color: #666;
+  font: normal 20px/20px "Trebuchet MS",Georgia,Arial,Helvetica;
+  letter-spacing: -1px;
+  text-shadow: 0 0 2px #D2D2D2;
+  padding: 0.4em 0.2em 0.4em 0.24em;
+}
+#new-post #title {
   line-height: .75em;
   padding-bottom: 7px;
 }
@@ -195,7 +150,16 @@ p {
   width: 100%;
   padding: 0;
 }
-.syntaxhighlighter { padding: 1px !important; }
+#new-post #body {
+  line-height: .75em;
+  padding-bottom: 7px;
+}
+#new-post textarea {
+  font-family: Droid Serif, serif;
+  font-size: 1.125em;
+  line-height: 1.45em;
+  text-align: justify;
+}
 .button input {
   border: solid 1px rgb(133, 177, 222);
   background-color: rgba(237, 242, 247, 0.55);
@@ -203,4 +167,6 @@ p {
   margin: 2px auto 2px auto;
   padding: 4px;
 }
-a { color: #00B7FF; }
+.syntaxhighlighter {
+  padding: 1px !important;
+}
