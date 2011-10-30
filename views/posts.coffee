@@ -1,5 +1,5 @@
 header ->
-    h2 "simpleblog"
+    h1 "simpleblog"
 
 div "#main", ->
     h3 style: "margin-top:-50px; margin-bottom:50px;", ->

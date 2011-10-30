@@ -1,4 +1,4 @@
-header -> h2 "simpleblog"
+header -> h1 "simpleblog"
 
 div "#main", ->
     h3 -> a href: "/posts", -> "Home"

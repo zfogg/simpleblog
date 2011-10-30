@@ -12,7 +12,8 @@ html ->
 
         link rel: "stylesheet", href: "/css/normalize.css"
         link rel: "stylesheet", href: "/css/style.css"
-        link rel: "stylesheet", href: "http://fonts.googleapis.com/css?family=Droid+Serif:400,700,700italic,400italic"
+        link rel: "stylesheet", href: "http://fonts.googleapis.com/css?family=Droid+Sans:400,700,700italic,400italic"
+        link rel: "stylesheet", href: "http://fonts.googleapis.com/css?family=Ubuntu:500"
 
         # SyntaxHighlighter
         link rel: "stylesheet", href: "/css/shCore.css"

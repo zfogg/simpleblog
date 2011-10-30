@@ -1,4 +1,4 @@
-header -> h2 @title
+header -> h1 @title
 
 div "#canvas-container", ->
     link rel: "stylesheet", href: "/css/canvas.css"

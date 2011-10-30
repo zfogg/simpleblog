@@ -24,21 +24,22 @@ body {
   min-width: 32em;
 }
 header {
-  padding: 40px 0 15px 0;
-  margin: 0 25px 0 25px;
+  padding: 30px 0 15px 0;
+  margin: 0 -25px 0 -25px;
   box-shadow: 0 4px 2px -2px gray;
 }
 header h2 {
   text-align: center;
   padding-bottom: 0.25em;
 }
+header h1 {
+  text-align: center;
+}
 body h1 {
-  font-size: 28px;
-  line-height: 108%;
-  letter-spacing: 0.15em;
-  font-family: "Courier New", monospace;
-  font-variant: small-caps;
+  font: bold 38px/38px "Droid Sans", monospace;
+  letter-spacing: 0.125em;
   text-shadow: 2px 1px 3px #2f4f4f;
+  margin-bottom: 0.15em;
 }
 h1 a {
   color: #515151;
@@ -49,10 +50,10 @@ h1 a:visited {
   border: 0;
 }
 body h2 {
-  color: #515151;
-  font: bold 26px/28px "Trebuchet MS",Georgia,Arial,Helvetica;
+  font: bold 26px/28px "Trebuchet MS", Georgia, Arial;
   letter-spacing: -1px;
   text-shadow: 3px 2px 3px #b8b8b8;
+  color: #515151;
   margin: 0;
 }
 h2 a {
@@ -64,11 +65,12 @@ h2 a:visited {
   border: 0;
 }
 body h3 {
-  color: #666;
-  font: normal 20px/20px "Trebuchet MS",Georgia,Arial,Helvetica;
+  font: normal 20px/24px Ubuntu, Georgia, Arial;
   letter-spacing: -1px;
-  text-shadow: 0 0 2px #D2D2D2;
-  padding: 0.4em 0.2em 0.4em 0.24em;
+  text-shadow: 0 0 3px #D2D2D2;
+  margin-top: 0.5em;
+  color: #666;
+  padding: .25em .2em .2em .2em;
 }
 h3 a {
   color: #515151;
@@ -84,9 +86,7 @@ h4 {
   padding: 0.2em 0 0.1em 0;
 }
 body p {
-  font-family: Droid Serif, serif;
-  font-size: 1.125em;
-  line-height: 1.45em;
+  font: normal 14px/20px "Droid Sans", sans-serif;
   text-align: justify;
 }
 p a {
@@ -129,18 +129,19 @@ p a {
   margin-right: -3px;
 }
 .post #title input {
-  color: #515151;
-  font: bold 26px/28px "Trebuchet MS",Georgia,Arial,Helvetica;
+  font: bold 26px/28px "Trebuchet MS", Georgia, Arial;
   letter-spacing: -1px;
   text-shadow: 3px 2px 3px #b8b8b8;
+  color: #515151;
   margin: 0;
 }
 .post label {
-  color: #666;
-  font: normal 20px/20px "Trebuchet MS",Georgia,Arial,Helvetica;
+  font: normal 20px/24px Ubuntu, Georgia, Arial;
   letter-spacing: -1px;
-  text-shadow: 0 0 2px #D2D2D2;
-  padding: 0.4em 0.2em 0.4em 0.24em;
+  text-shadow: 0 0 3px #D2D2D2;
+  margin-top: 0.5em;
+  color: #666;
+  padding: .25em .2em .2em .2em;
 }
 #new-post #title {
   line-height: .75em;
@@ -155,9 +156,7 @@ p a {
   padding-bottom: 7px;
 }
 #new-post textarea {
-  font-family: Droid Serif, serif;
-  font-size: 1.125em;
-  line-height: 1.45em;
+  font: normal 14px/20px "Droid Sans", sans-serif;
   text-align: justify;
 }
 .button input {

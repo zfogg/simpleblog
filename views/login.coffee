@@ -1,4 +1,5 @@
-h1 "Identification"
+header ->
+    h1 "Identification"
 
 form method: "post", action: "/login", ->
     fieldset ->
