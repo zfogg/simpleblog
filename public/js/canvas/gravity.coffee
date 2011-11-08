@@ -114,7 +114,6 @@ Gravity = (canvas) ->
         (Math.sin gameTime / 10) * 84,
         (Math.cos gameTime / 10) * 84
       )
-      do @draw
 
     updatePosition: ->
       @position.x = @trackedPosition.x
@@ -123,6 +122,7 @@ Gravity = (canvas) ->
     update: ->
       if @isClicked.right
         do @rightHeldDown
+        do @draw
       else
         do @updatePosition
 
