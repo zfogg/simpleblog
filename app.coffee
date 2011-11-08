@@ -1,7 +1,6 @@
 ###
 # Dependencies
 ###
-require.paths.push "./lib"
 
 require "date-utils"
 express  = require "express"
@@ -45,7 +44,7 @@ app.get "/posts/new", (req, res) -> res.render "new-post", (title: 'New Post')
 app.get "/posts", (req, res) ->
     (db.view "blog", "posts_by_date").then (results) ->
         res.render "posts", (
-            title: "simpleblog",
+            title: "~/blog",
             posts: (postsToHTML results.rows)
         )
 
@@ -102,9 +101,12 @@ postsToHTML = do ->
         post.body = markdown.parse post.body
         timeStamped post, DATE_FORMAT_HTML
     many = (posts) ->
-        do (_ posts).reverse
-        posts = (_ posts).first POST_LIMIT
-        (_ posts).map (post) -> one post.value
+        (_ posts).chain(
+        ).map( (post) -> one post.value
+        ).sortBy( (p) -> new Date p.date
+        ).last( POST_LIMIT
+        ).reverse(
+        ).value()
     (p) -> if (_ p).isArray() then many p else one p
 
 validPost    = (post)    -> post.title and post.body

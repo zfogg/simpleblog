@@ -13,15 +13,18 @@ h2 = ->
   color: '#515151'
   margin: '0'
 h3 = ->
-  font: 'normal 20px/24px Ubuntu, Georgia, Arial'
+  font: 'normal 20px/20px Ubuntu, Georgia, Arial'
   'letter-spacing': '-1px'
   'text-shadow': '0 0 3px #D2D2D2'
   'margin-top': "0.5em"
-  color: '#666'
+  'margin-bottom': "0.5em"
+  color: 'rgb(50, 50, 50)'
   padding: '.25em .2em .2em .2em'
 p = ->
   font: 'normal 14px/20px "Droid Sans", sans-serif'
   'text-align': 'justify'
+code = ->
+  font: "normal 12px/12px monospace, mono"
 
 module.exports =
   html:
@@ -96,14 +99,20 @@ module.exports =
     a:
       color: linkColor
 
+  "body code": do code
+
   ".post":
     'background-color': 'white'
     'box-shadow': '3px 0px 2px #888, -3px 0px 2px #888'
     padding: '12px'
     margin: '15px'
 
+    p:
+      "margin-left": "1em"
+      "margin-right": "1em"
     "p:first-letter":
       'font-size': '1.8em'
+      'text-transform': 'uppercase'
     'p + p':
       'text-indent': '2.5em'
     'p + p:first-letter':
@@ -128,6 +137,9 @@ module.exports =
       clear: 'both'
     "#title input": do h2
     label: do h3
+    code:
+      "margin-left": "2em"
+      "margin-right": "2em"
 
   "#new-post":
     "#title":

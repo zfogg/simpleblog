@@ -11,7 +11,7 @@
       , "public": "./public"
   }
   , "dependencies": {
-      "express": "2.4.7"
+      "express": ">=2.5.0"
     , "couchdb": ">=0.2.0a"
     , "coffee-script": ">=1.1.2"
     , "coffeekup": ">=0.3.1"
