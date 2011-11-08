@@ -148,7 +148,7 @@ Gravity = (canvas) ->
 
   initPositions = (rows, columns) ->
     position = (x, y) -> new Vector2 x * canvas.width / columns, y * canvas.height / rows
-    (position (n / rows) | 0, n % rows for n in [0..rows*columns])
+    (position (n / columns) | 0, n % rows for n in [0..rows*columns])
 
   mapOverUniquePairs = (f, set) ->
     i = set.length
