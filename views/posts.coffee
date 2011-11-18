@@ -8,6 +8,13 @@ div "#main", ->
         div "post", ->
             hgroup ->
                 h2 -> a href: "/posts/#{post._id}", -> post.title
+                h3 ->
+                    text " - "
+                    if post.comments
+                        "#{post.comments.length} comment" + ( # Pluralize if necessary.
+                            if post.comments.length > 1 then "s" else ""
+                        )
+                    else "no comments"
                 h4 post.date
             div "content", -> post.body
 

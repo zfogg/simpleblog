@@ -56,8 +56,8 @@ app.get "/posts/page/:pageNumber", (req, res) ->
     (db.view "blog", "posts_by_date").then (results) ->
         posts = (_ results.rows).initial POST_LIMIT * (pageNumber - 1)
         res.render "posts", (
-            title: "Page #{pageNumber}|simpleblog",
-            posts: (postsToHTML posts),
+            title:      "Page #{pageNumber}|simpleblog",
+            posts:      (postsToHTML posts),
             pageNumber: pageNumber
         )
 
@@ -67,7 +67,6 @@ app.get "/posts/:id", (req, res) ->
 
 app.post "/posts", (req, res) ->
     post = req.body
-
     post.type = "post"
     if validPost post
         db.saveDoc timeStamped post, DATE_FORMAT_DB
@@ -82,7 +81,6 @@ app.post "/posts/:id/comment", (req, res) ->
         post.comments = post.comments or []
         if validComment comment
             post.comments.push timeStamped comment, DATE_FORMAT_DB
-
         (db.saveDoc post).then () ->
             res.redirect "/posts/"+id
 
@@ -102,9 +100,9 @@ postsToHTML = do ->
         timeStamped post, DATE_FORMAT_HTML
     many = (posts) ->
         (_ posts).chain(
-        ).map( (post) -> one post.value
-        ).sortBy( (p) -> new Date p.date
-        ).last( POST_LIMIT
+        ).map(      (post) -> one post.value
+        ).sortBy(   (p) -> new Date p.date
+        ).last(     POST_LIMIT
         ).reverse(
         ).value()
     (p) -> if (_ p).isArray() then many p else one p
