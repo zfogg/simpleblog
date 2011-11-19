@@ -250,7 +250,7 @@ Gravity = (canvas) ->
 window.onload = ->
   canvas = document.getElementById "canvas"
   canvas.width = 800
-  canvas.height = 800
+  canvas.height = 480
 
   if canvas.getContext
     Gravity canvas
