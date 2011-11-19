@@ -15,7 +15,7 @@ h2 = ->
     color: '#515151'
     margin: '0'
 h3 = ->
-    font: 'normal 20px/20px Ubuntu, Georgia, Arial'
+    font: 'normal 19px/19px Ubuntu, Georgia, Arial'
     'letter-spacing': '-1px'
     'text-shadow': "2px 1px 2px #E2E2E2"
     'margin-top': "0.5em"
@@ -133,11 +133,11 @@ module.exports =
                 display: 'inline-block'
             h3:
                 color: "#CCC"
+                'margin-left': '4px'
                 display: 'inline-block'
             h4:
-                float: 'right'
-                display: 'inline-block'
-                'margin-right': '-3px'
+                color: "#CCC"
+                'margin': '8px 0 -8px 0'
         '.content':
             clear: 'both'
         "#title input": do h2

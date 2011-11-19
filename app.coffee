@@ -56,7 +56,7 @@ app.get "/posts/page/:pageNumber", (req, res) ->
     (db.view "blog", "posts_by_date").then (results) ->
         posts = (_ results.rows).initial POST_LIMIT * (pageNumber - 1)
         res.render "posts", (
-            title:      "Page #{pageNumber}|simpleblog",
+            title:      "~/blog/p#{pageNumber}",
             posts:      (postsToHTML posts),
             pageNumber: pageNumber
         )

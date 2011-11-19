@@ -19,14 +19,6 @@ Math.clipValues = (value, lower, upper) ->
 class Vector2
   constructor: (@x = 0, @y = 0) ->
 
-  add: (v2) ->
-    @x += v2.x
-    @y += v2.y
-
-  clone: -> new Vector2 @x, @y
-
-  Unit: (n = 1) -> new Vector2 n, n
-
 #
 # Assorted helper functions
 #

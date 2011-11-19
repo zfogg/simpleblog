@@ -14,7 +14,9 @@ Gravity = (canvas) ->
   class PhysicalBody
     constructor: (@position = new Vector2, @mass = 1, @size = 1, @restitution = 1, @velocity = new Vector2) ->
 
-    updatePosition: -> @position.add @velocity
+    updatePosition: ->
+      @position.x += @velocity.x
+      @position.y += @velocity.y
     applyForce: (acceleration) ->
       @velocity.x += 0.5 * acceleration.x * @mass
       @velocity.y += 0.5 * acceleration.y * @mass
@@ -24,7 +26,7 @@ Gravity = (canvas) ->
       super @position, @mass, @size, 0.85
 
     update: (gameTime) ->
-      @applyForce attractionOfGravity @, cursor
+      applyGravity @, cursor
       unless cursor.isClicked.right or cursor.isClicked.left
         @bounceOffLimits canvas.width, canvas.height, @mass*2
       do @updatePosition
@@ -56,11 +58,11 @@ Gravity = (canvas) ->
     constructor: ->
       @position = new Vector2
       @trackedPosition = new Vector2
-      @canvasCenter = new Vector2 canvas.width / 2, canvas.height / 2
+      @canvasCenter = -> new Vector2 canvas.width / 2, canvas.height / 2
 
-      ($ "#canvas").mousedown @toggleDown
+      ($ "#canvas").mousedown (e) => @toggleClicks e, true
       ($ "#canvas").mousedown @mouseDown
-      ($ "body").mouseup      @toggleUp
+      ($ "body").mouseup      (e) => @toggleClicks e, false
       ($ "body").mouseup      @mouseUp
 
       canvas.addEventListener "mousemove", (cursorUpdater @trackedPosition, canvas), false
@@ -71,27 +73,22 @@ Gravity = (canvas) ->
       middle: false
       right:  false
 
-    toggleDown: (e) => @toggleClicks e, true
-    toggleUp:   (e) => @toggleClicks e, false
     toggleClicks: (e, value) ->
       switch e.which
-        when 1 then @isClicked.left = value
+        when 1 then @isClicked.left   = value
         when 2 then @isClicked.middle = value
-        when 3 then @isClicked.right = value
+        when 3 then @isClicked.right  = value
 
     mouseDown: =>
       if @isClicked.left
         @mass = cursorMassControl.value
         currentFriction.value = frictionControl.value/frictionModifier * cursorFrictionControl.value
-        currentGravity.value = gravityControl.value/gravityModifier
+        currentGravity.value  = gravityControl.value/gravityModifier
 
       else if @isClicked.right
         @mass = cursorMassControl.value
         currentFriction.value = 0.2 * (frictionControl.value/frictionModifier * cursorFrictionControl.value)
-        currentGravity.value = gravityControl.value/gravityModifier
-
-      else if @isClicked.right
-        null
+        currentGravity.value  = gravityControl.value/gravityModifier
 
     mouseUp: =>
       unless @isClicked.left
@@ -100,20 +97,12 @@ Gravity = (canvas) ->
             s.applyForce forceTowards s.position, @position, cursorReleaseForceControl.value
         @mass = 0
         currentFriction.value = frictionControl.value/frictionModifier
-        currentGravity.value = gravityControl.value/gravityModifier
-
-      unless @isClicked.middle
-        null
-
-      unless @isClicked.right
-        null
+        currentGravity.value  = gravityControl.value/gravityModifier
 
     rightHeldDown: =>
-      @position = @canvasCenter.clone()
-      @position.add new Vector2(
-        (Math.sin gameTime / 10) * 84,
-        (Math.cos gameTime / 10) * 84
-      )
+      @position = do @canvasCenter
+      @position.x += (Math.sin gameTime / 10) * 84
+      @position.y += (Math.cos gameTime / 10) * 84
 
     updatePosition: ->
       @position.x = @trackedPosition.x
@@ -132,23 +121,38 @@ Gravity = (canvas) ->
       do ctx.closePath
       do ctx.fill
 
-  main = ->
-    clearCanvas canvas, ctx
-    do cursor.update
-
-    mapOverUniquePairs applyGravity, squares
-    square.update gameTime for square in squares
-
-    gameTime++
-    window.requestFrame main, canvas
-
   constructSquares = (rows, columns, size) ->
+    initPositions = (rows, columns) ->
+      position = (x, y) -> new Vector2 x * canvas.width / columns, y * canvas.height / rows
+      console.log [0...rows*columns].length
+      position (n / columns) | 0, n % rows for n in [0...rows*columns]
+
     newSquare = (p, i) -> new Square p, size, size, i, color Math.random
     newSquare position, index for position, index in initPositions rows, columns
 
-  initPositions = (rows, columns) ->
-    position = (x, y) -> new Vector2 x * canvas.width / columns, y * canvas.height / rows
-    (position (n / columns) | 0, n % rows for n in [0..rows*columns])
+  applyGravity = do ->
+    gravity = (G, m1, m2, r) ->
+      G*m1*m2 / r*r
+
+    attractionOfGravity = (b1, b2) ->
+      d = Math.direction b1.position, b2.position
+      r = hypotenuse d.x, d.y
+
+      if r isnt 0 and r > currentDistance.value
+        g = gravity currentGravity.value, b1.mass, b2.mass, r
+        new Vector2 -d.x / r*g, -d.y / r*g
+      else
+        do new Vector2
+
+    (b1, b2) ->
+      f = attractionOfGravity b1, b2
+      b1.applyForce f
+      b2.applyForce new Vector2 -f.x, -f.y
+
+  forceTowards = (from, to, coEf = 1) ->
+    d = Math.direction from, to
+    r = hypotenuse d.x, d.y
+    new Vector2 -d.x/r * coEf, -d.y/r * coEf
 
   mapOverUniquePairs = (f, set) ->
     i = set.length
@@ -157,29 +161,6 @@ Gravity = (canvas) ->
         f set[i], set[j]
     return
 
-  applyGravity = (b1, b2) ->
-    f = attractionOfGravity b1, b2
-    b1.applyForce f
-    b2.applyForce new Vector2 -f.x, -f.y
-
-  forceTowards = (from, to, coEf) ->
-    coEf or= 1
-    d = Math.direction from, to
-    r = hypotenuse d.x, d.y
-    new Vector2 -d.x/r * coEf, -d.y/r * coEf
-
-  attractionOfGravity = (b1, b2) ->
-    d = Math.direction b1.position, b2.position
-    r = hypotenuse d.x, d.y
-
-    if r isnt 0 and r > currentDistance.value
-      g = gravity currentGravity.value, b1.mass, b2.mass, r
-      new Vector2 -d.x / r*g, -d.y / r*g
-    else
-      do new Vector2
-
-  gravity = (G, m1, m2, r) -> G*m1*m2 / r*r
-
   hypotenuseLookup = (digits, maxSquare) ->
     sqrtTable = do ->
         pow = Math.pow 10, digits
@@ -187,16 +168,19 @@ Gravity = (canvas) ->
         (n) -> sqrts[(n / 100 * pow) | 0] or Math.sqrt n
     (a, b) -> sqrtTable (a*a + b*b)
 
+  # A lookup-table of square roots, behind a pythagorean theroem function.
+  # The second argument determines the necessary square roots to memoize. Careful: workload increases exponentially.
+  hypotenuse   = hypotenuseLookup 3, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
+
+  cursor       = new Cursor
+
+  # A square of squares the size of the argument.
   resetSquares = (n) -> squares = constructSquares n, n, (Math.randomBetween 3, 6)
-  hypotenuse = hypotenuseLookup 3, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
-  cursor = new Cursor
-  resetSquares 16
 
 # Canvas Controls
   controls         = new CanvasControls
   gravityModifier  = 1000000
   frictionModifier = 10000
-  distanceModifier = 1
 
   gravityControl = controls.NumberInput(
     "Gravitational Attraction", currentGravity.value * gravityModifier
@@ -211,10 +195,10 @@ Gravity = (canvas) ->
   frictionControl.onchange = controls.propertyUpdater currentFriction, "value", frictionModifier
 
   distanceControl = controls.NumberInput(
-    "Gravity Deadzone Radius", currentDistance.value * distanceModifier,
+    "Gravity Deadzone Radius", currentDistance.value,
     "oninput", controls.controlLimit (lower: 0.25, upper: 15)
   )
-  distanceControl.onchange = controls.propertyUpdater currentDistance, "value", distanceModifier
+  distanceControl.onchange = controls.propertyUpdater currentDistance, "value"
 
   cursorFrictionControl = controls.NumberInput(
     "Cursor Friction Coefficient", 25,
@@ -244,12 +228,29 @@ Gravity = (canvas) ->
     "Reset Squares", "onclick", (e) -> resetSquares particleCountControl.value
   )
 
+  main = ->
+    clearCanvas canvas, ctx
+    do cursor.update
+
+    mapOverUniquePairs applyGravity, squares
+    square.update gameTime for square in squares
+
+    gameTime++
+    window.requestFrame main, canvas
+
+# Init.
+  # Allows particles outside of the viewable canvas, so they will form regular patterns.
+  cursor.isClicked.left = true
+  # Forces them back into the viewable area.
+  setTimeout (-> cursor.isClicked.left = false), 10000
+
+  resetSquares 16
   do main
 
 window.onload = ->
   canvas = document.getElementById "canvas"
   canvas.width = 800
-  canvas.height = 480
+  canvas.height = 800
 
   if canvas.getContext
     Gravity canvas
