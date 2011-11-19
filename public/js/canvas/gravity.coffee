@@ -175,7 +175,10 @@ Gravity = (canvas) ->
   cursor       = new Cursor
 
   # A square of squares the size of the argument.
-  resetSquares = (n) -> squares = constructSquares n, n, (Math.randomBetween 3, 6)
+  resetSquares = (n) ->
+    cursor.isClicked.left = true
+    setTimeout (-> cursor.isClicked.left = false), 7000
+    squares = constructSquares n, n, (Math.randomBetween 3, 6)
 
 # Canvas Controls
   controls         = new CanvasControls
@@ -239,11 +242,6 @@ Gravity = (canvas) ->
     window.requestFrame main, canvas
 
 # Init.
-  # Allows particles outside of the viewable canvas, so they will form regular patterns.
-  cursor.isClicked.left = true
-  # Forces them back into the viewable area.
-  setTimeout (-> cursor.isClicked.left = false), 10000
-
   resetSquares 16
   do main
 
