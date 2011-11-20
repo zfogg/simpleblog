@@ -1,15 +1,17 @@
 Gravity = (canvas) ->
-    ctx             = canvas.getContext  "2d"
-    gameTime        = 0
-    squares         = []
+    ctx      = canvas.getContext  "2d"
+    gameTime = 0
+    squares  = []
 
-    defaultGravity  = 6.67 * Math.pow 10, -6
-    defaultFriction = 0.000115
-    defaultDistance = Math.PI
+    defaultGravity        = 6.67 * Math.pow 10, -6
+    defaultFriction       = 1.15 * Math.pow 10, -4
+    defaultDistance       = 3
+    defaultCursorFriction = 25
+    defaultCursorMass     = 2500
+    defaultCursorForce    = 0.75
 
-    currentGravity  = value: defaultGravity
+
     currentFriction = value: defaultFriction
-    currentDistance = value: defaultDistance
 
     class PhysicalBody
         constructor: (@position = new Vector2, @mass = 1, @size = 1, @restitution = 1, @velocity = new Vector2) ->
@@ -27,10 +29,10 @@ Gravity = (canvas) ->
 
         update: (gameTime) ->
             applyGravity @, cursor
-            unless cursor.isClicked.right or cursor.isClicked.left
+            if not cursor.isClicked.right and not cursor.isClicked.left
                 @bounceOffLimits canvas.width, canvas.height, @mass*2
             do @updatePosition
-            @decayVelocity currentFriction.value # Less real, more fun.
+            @decayVelocity frictionCVals.current
             do @draw
 
         decayVelocity: (n) ->
@@ -60,12 +62,12 @@ Gravity = (canvas) ->
             @trackedPosition = new Vector2
             @canvasCenter    = -> new Vector2 canvas.width / 2, canvas.height / 2
 
-            ($ "#canvas").mousedown (e) => @toggleClicks e, true
-            ($ "#canvas").mousedown @mouseDown
-            ($ "body").mouseup      (e) => @toggleClicks e, false
-            ($ "body").mouseup      @mouseUp
+            ($ canvas).mousedown (e) => @toggleClicks e, true
+            ($ canvas).mousedown @mouseDown
+            ($ "body").mouseup   (e) => @toggleClicks e, false
+            ($ "body").mouseup   @mouseUp
+            ($ canvas).mousemove (cursorUpdater @trackedPosition, canvas)
 
-            canvas.addEventListener "mousemove", (cursorUpdater @trackedPosition, canvas), false
             super
 
         isClicked:
@@ -73,36 +75,37 @@ Gravity = (canvas) ->
             middle: false
             right:  false
 
-        toggleClicks: (e, value) ->
+        toggleClicks: (e, value) =>
             switch e.which
                 when 1 then @isClicked.left   = value
                 when 2 then @isClicked.middle = value
                 when 3 then @isClicked.right  = value
+            true
 
         mouseDown: =>
             if @isClicked.left
-                @mass = cursorMassControl.value
-                currentFriction.value = frictionControl.value/frictionModifier * cursorFrictionControl.value
-                currentGravity.value  = gravityControl.value/gravityModifier
+                @mass = cursorMassCVals.getFromControl cursorMassControl
+                frictionCVals.current = frictionControl.value / frictionCVals.modifier * cursorFrictionControl.value
 
             else if @isClicked.right
-                @mass = cursorMassControl.value
-                currentFriction.value = 0.2 * (frictionControl.value/frictionModifier * cursorFrictionControl.value)
-                currentGravity.value  = gravityControl.value/gravityModifier
+                @mass = 0.25 * cursorMassCVals.getFromControl cursorMassControl
+                frictionCVals.current = 0.2 * (frictionControl.value / frictionCVals.modifier * cursorFrictionControl.value)
+            true
 
         mouseUp: =>
             unless @isClicked.left
                 squares.forEach (s) =>
                     if 75 > Math.distance s.position, @position
-                        s.applyForce forceTowards s.position, @position, cursorReleaseForceControl.value
+                        s.applyForce forceTowards s.position, @position, cursorForceCVals.getFromControl cursorForceControl
                 @mass = 0
-                currentFriction.value = frictionControl.value/frictionModifier
-                currentGravity.value  = gravityControl.value/gravityModifier
+                frictionCVals.setWithControl frictionControl
+                gravityCVals.setWithControl gravityControl
+            true
 
         rightHeldDown: =>
             @position = do @canvasCenter
-            @position.x += (Math.sin gameTime / 10) * 84
-            @position.y += (Math.cos gameTime / 10) * 84
+            @position.x += (Math.sin gameTime / 14) * 124
+            @position.y += (Math.cos gameTime / 14) * 124
 
         updatePosition: ->
             @position.x = @trackedPosition.x
@@ -125,8 +128,8 @@ Gravity = (canvas) ->
             d = Math.direction b1.position, b2.position
             r = hypotenuse d.x, d.y
 
-            if r isnt 0 and r > currentDistance.value
-                g = gravity currentGravity.value, b1.mass, b2.mass, r
+            if r isnt 0 and r > distanceCVals.current
+                g = gravity gravityCVals.current, b1.mass, b2.mass, r
                 new Vector2 -d.x / r*g, -d.y / r*g
             else do new Vector2
 
@@ -149,13 +152,12 @@ Gravity = (canvas) ->
                 f set[i], set[j]
         return
 
-    hypotenuseLookup = (digits, maxSquare) ->
+    hypotenuseLookup = (digits, minSquare = 0, maxSquare) ->
         sqrtTable = do ->
             pow   = Math.pow 10, digits
-            sqrts = (Math.sqrt x for x in [0 .. maxSquare * pow] by 1.0 / pow)
+            sqrts = (Math.sqrt x for x in [minSquare .. maxSquare * pow] by 1.0 / pow)
             (n) -> sqrts[(n / 100 * pow) | 0] or Math.sqrt n
         (a, b) -> sqrtTable (a*a + b*b)
-
 
     # Returns a square of squares the size of the argument.
     resetSquares = do ->
@@ -177,55 +179,55 @@ Gravity = (canvas) ->
             squares = constructSquares size, size, (Math.randomBetween 3, 6)
 
 # Canvas Controls
-    controls         = new CanvasControls
-    gravityModifier  = 1000000
-    frictionModifier = 10000
+    controls     = new CanvasControls
+    controlLimit = lower: 10, upper: 100
 
-    gravityControl = controls.NumberInput(
-        "Gravitational Attraction", currentGravity.value * gravityModifier
-        "oninput", controls.controlLimit (lower: 0, upper: 100)
-    )
-    gravityControl.onchange = controls.propertyUpdater currentGravity, "value", gravityModifier
+    controlValueObj = (value) -> (
+            default: value
+            current: value
+            modifier: toCommonRange value, controlLimit
+            setWithControl: (control) -> @current = control.value / @modifier
+            getFromControl: (control) -> control.value / @modifier
+        )
+    toCommonRange = (n, range, coefficient = 1) ->
+        if n < range.lower
+            toCommonRange n * 10, range, coefficient * 10
+        else if n > range.upper
+            toCommonRange n / 10, range, coefficient / 10
+        else coefficient
 
-    frictionControl = controls.NumberInput(
-        "Atmospheric Friction", (Math.floor currentFriction.value * frictionModifier * 100) / 100,
-        "oninput", controls.controlLimit (lower: 0.25, upper: 15)
-    )
-    frictionControl.onchange = controls.propertyUpdater currentFriction, "value", frictionModifier
+    rangeInput = (name, cValObj) ->
+        control = controls.RangeInput(
+            name, cValObj.default * cValObj.modifier,
+            controlLimit.lower, controlLimit.upper, 1
+        )
+        ($ control).blur controls.propertyUpdater cValObj, "current", cValObj.modifier
+        ($ control).blur controls.controlLimit controlLimit
+        control
 
-    distanceControl = controls.NumberInput(
-        "Gravity Deadzone Radius", currentDistance.value,
-        "oninput", controls.controlLimit (lower: 0.25, upper: 15)
-    )
-    distanceControl.onchange = controls.propertyUpdater currentDistance, "value"
+    gravityCVals        = controlValueObj defaultGravity
+    frictionCVals       = controlValueObj defaultFriction
+    distanceCVals       = controlValueObj defaultDistance
+    cursorFrictionCVals = controlValueObj defaultCursorFriction
+    cursorMassCVals     = controlValueObj defaultCursorMass
+    cursorForceCVals    = controlValueObj defaultCursorForce
 
-    cursorFrictionControl = controls.NumberInput(
-        "Cursor Friction Coefficient", 25,
-        "oninput", controls.controlLimit (lower: 0, upper: 100)
-    )
+    gravityControl        = rangeInput "Gravitational Attraction",    gravityCVals
+    frictionControl       = rangeInput "Atmospheric Friction",        frictionCVals
+    distanceControl       = rangeInput "Gravity Deadzone Radius",     distanceCVals
+    cursorFrictionControl = rangeInput "Cursor Friction Coefficient", cursorFrictionCVals
+    cursorMassControl     = rangeInput "Cursor Body Mass",            cursorMassCVals
+    cursorForceControl    = rangeInput "Cursor Release Force",        cursorForceCVals
 
-    cursorMassControl = controls.NumberInput(
-        "Cursor Body Mass", 2500,
-        "oninput", controls.controlLimit (lower: 0, upper: 10 * 1000)
-    )
 
-    cursorReleaseForceControl = controls.NumberInput(
-        "Cursor Release Force", 0.75,
-        "oninput", controls.controlLimit (lower: -5, upper: 5)
-    )
+    defaultButton = controls.ButtonInput "Defaults Values"
+    ($ defaultButton).click -> controls.resets.forEach (x) -> do x
 
-    defaultButton = controls.ButtonInput(
-        "Defaults Values", "onclick", -> controls.resets.forEach (x) -> do x
-    )
+    particleCountControl = controls.NumberInput "Rows of Squares", 16
+    ($ particleCountControl).blur controls.controlLimit (lower: 1, upper: 30)
 
-    particleCountControl = controls.NumberInput(
-        "Rows of Squares", 16,
-        "oninput", controls.controlLimit (lower: 1, upper: 80)
-    )
-
-    resetButton = controls.ButtonInput(
-        "Reset Squares", "onclick", (e) -> resetSquares particleCountControl.value
-    )
+    resetButton = controls.ButtonInput("Reset Squares")
+    ($ resetButton).click (e) -> resetSquares particleCountControl.value
 
     main = ->
         clearCanvas canvas, ctx
@@ -238,7 +240,7 @@ Gravity = (canvas) ->
         window.requestFrame main, canvas
 
 # Init.
-    hypotenuse = hypotenuseLookup 3, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
+    hypotenuse = hypotenuseLookup 3, 0, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
     cursor = new Cursor
     resetSquares 16
     do main

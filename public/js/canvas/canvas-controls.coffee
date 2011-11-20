@@ -15,21 +15,23 @@ class CanvasControls
         @controls.appendChild p
         p
 
-    NumberInput: (name, defaultValue, eventType, event) ->
+    NumberInput: (name, defaultValue) ->
         @pElement name
         numberInput = @inputElement "number", defaultValue
-        numberInput[eventType] = event if event
-
-        @resets.push ->
-            numberInput.value = defaultValue
-            numberInput.onchange() if numberInput.onchange
-
+        @resets.push -> numberInput.value = defaultValue
         numberInput
 
-    ButtonInput: (name, eventType, event) ->
-        button = @inputElement "button", name
-        button[eventType] = event if event
+    RangeInput: (name, defaultValue, min = 1, max = 100, step = 10) ->
+        @pElement name
+        rangeInput = @inputElement "range", defaultValue
+        @resets.push -> rangeInput.value = defaultValue
+        rangeInput.min  = min
+        rangeInput.max  = max
+        rangeInput.step = step
+        rangeInput
 
+    ButtonInput: (name) ->
+        button = @inputElement "button", name
         button
 
     controlLimit: (limit) ->
@@ -38,12 +40,11 @@ class CanvasControls
     propertyUpdater: (obj, objProperty, modifier) ->
         -> obj[objProperty] = @value / (modifier or 1)
 
-
     resets: []
 
 ($ document).ready ->
     ($ "#canvas-controls-container").show()
-    ($ "#toggle-menu a").mousedown (event) ->
+    ($ "#toggle-menu a").click (event) ->
         if event.which is 1
             ($ "#canvas-controls").slideToggle "slow"
             if (($ "#toggle-menu a").text().indexOf "Show") is -1

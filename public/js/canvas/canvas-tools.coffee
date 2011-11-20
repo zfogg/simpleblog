@@ -8,6 +8,11 @@ Math.distance = (p1, p2) ->
     d = Math.direction p1, p2
     Math.hypotenuse d.x, d.y
 
+Math.roundDigits = (n, digits) ->
+    parseFloat (
+        ((Math.round (n * (Math.pow 10, digits)).toFixed(digits-1)) / (Math.pow 10,digits)).toFixed digits
+    )
+
 Math.randomBetween = (min, max) -> Math.random() * (max - min) + min
 
 Math.clipValues = (value, lower, upper) ->
