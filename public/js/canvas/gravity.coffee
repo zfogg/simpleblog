@@ -3,6 +3,7 @@
 Gravity = (canvas) ->
     ctx      = canvas.getContext  "2d"
     gameTime = 0
+    squares  = []
 
     defaultGravity        = 6.67 * Math.pow 10, -6
     defaultFriction       = 1.15 * Math.pow 10, -4
