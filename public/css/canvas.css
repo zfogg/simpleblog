@@ -28,25 +28,29 @@ canvas {
   font-size: 10px;
 }
 
-#canvas-controls-container p {
-  color: white;
+#canvas-controls p {
   margin: 0.2em;
   font-size: 12px;
+}
+#canvas-controls p, #canvas-controls h3 {
+  color: white;
   text-shadow: 2px 0 3px black;
+  text-align: center;
 }
 
 #canvas-controls-container h3, #canvas-controls-container p {
   cursor: default;
 }
-
 #canvas-controls-container a {
   cursor: pointer;
 }
 
 #canvas-controls {
   display: none;
+  min-width: 120px;
+  max-width: 160px;
   background: rgba(0, 0, 0, 0.85);
-  padding: 0.55em;
+  padding: 7px;
   margin: 40px 0.75em 0.75em;
   border-radius: 4px;
   box-shadow: 3px 3px 6px rgb(50, 50, 90),
@@ -77,6 +81,8 @@ canvas {
   margin-top: 7px;
   display: block;
 
+  font-family: Impact, Charcoal, sans-serif;
+  font-weight: bold;
   border-radius: 8px;
   box-shadow: inset 2px 2px 4px rgb(50, 50, 90),
               inset -2px -2px 4px rgb(110, 140, 150);

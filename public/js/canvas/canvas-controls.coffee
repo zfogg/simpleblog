@@ -1,3 +1,5 @@
+# Dependencies: canvas-tools
+
 class CanvasControls
     constructor: ->
         @controls = document.getElementById "canvas-controls"
@@ -24,10 +26,12 @@ class CanvasControls
     RangeInput: (name, defaultValue, min = 1, max = 100, step = 10) ->
         @pElement name
         rangeInput = @inputElement "range", defaultValue
-        @resets.push -> rangeInput.value = defaultValue
+
         rangeInput.min  = min
         rangeInput.max  = max
         rangeInput.step = step
+
+        @resets.push -> rangeInput.value = defaultValue
         rangeInput
 
     ButtonInput: (name) ->
@@ -39,6 +43,14 @@ class CanvasControls
 
     propertyUpdater: (obj, objProperty, modifier) ->
         -> obj[objProperty] = @value / (modifier or 1)
+
+    controlValueObj: (value, limitRange) -> (
+            default:        value
+            current:        value
+            modifier:       Math.commonRangeCoefficient value, limitRange
+            setWithControl: (control) -> @current = control.value / @modifier
+            getFromControl: (control) -> control.value / @modifier
+        )
 
     resets: []
 

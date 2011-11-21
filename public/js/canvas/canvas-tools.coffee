@@ -21,6 +21,13 @@ Math.clipValues = (value, lower, upper) ->
     else
         if value < lower then lower else upper
 
+Math.commonRangeCoefficient = (n, range, coefficient = 1) ->
+    if n < range.lower
+        Math.commonRangeCoefficient n * 10, range, coefficient * 10
+    else if n > range.upper
+        Math.commonRangeCoefficient n / 10, range, coefficient / 10
+    else coefficient
+
 class Vector2
   constructor: (@x = 0, @y = 0) ->
 
