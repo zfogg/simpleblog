@@ -52,8 +52,15 @@ module.exports =
     "#container":
         height: '100%'
         margin: '0 auto'
-        'max-width': '72em'
+        'max-width': '64em'
         'min-width': '32em'
+
+        "#header-links":
+             "margin-top": "-50px"
+             "margin-bottom": "50px"
+             "h3 a":
+                 "margin-left": "0.45em"
+                 "margin-right": "0.45em"
 
     header:
         padding: '30px 0 15px 0'

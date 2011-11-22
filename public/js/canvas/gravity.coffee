@@ -67,7 +67,7 @@ Gravity = (canvas) ->
             ($ "body").mouseup   (e) => @toggleClicks e, false
             ($ canvas).mousedown @mouseDown
             ($ "body").mouseup   @mouseUp
-            ($ canvas).mousemove (cursorUpdater @trackedPosition, canvas)
+            ($ canvas).mousemove (CanvasTools.cursorUpdater @trackedPosition, canvas)
 
             super
 
@@ -171,7 +171,7 @@ Gravity = (canvas) ->
             position (n / columns) | 0, n % rows for n in [0...rows*columns]
 
         newSquare = (p, i, size) ->
-            new Square p, size, size, i, color Math.random
+            new Square p, size, size, i, CanvasTools.color Math.random
 
         (rows, columns, size) ->
             newSquare position, index, size for position, index in initPositions rows, columns
@@ -217,7 +217,7 @@ Gravity = (canvas) ->
     squares    = resetSquares 16
 
     do main = ->
-        clearCanvas canvas, ctx
+        CanvasTools.clearCanvas canvas, ctx
         do cursor.update
 
         mapOverUniquePairs applyGravity, squares

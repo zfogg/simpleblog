@@ -1,3 +1,40 @@
+CanvasTools =
+
+    color: (x = 1) ->
+        x = x() if x.call
+        '#'+("00000"+(x*16777216<<0).toString 16).substr(-6)
+
+    clearCanvas: (canvas, ctx) -> ctx.clearRect 0, 0, canvas.width, canvas.height
+
+    keyWasPressed: (e, code) ->
+        if window.event
+            window.event.keyCode is code
+        else e.which is code
+
+    cursorUpdater: (cursor, element) ->
+        (e) ->
+            x = y = 0
+            if e.pageX or e.pageY
+                x = e.pageX
+                y = e.pageY
+            else
+                x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
+                y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop
+            p = CanvasTools.findElementPosition element
+            cursor.x = x - element.offsetLeft - p.x
+            cursor.y = y - element.offsetTop - p.y
+
+    findElementPosition: (obj) ->
+        if obj.offsetParent
+            curleft = curtop = 0
+            loop
+                curleft += obj.offsetLeft
+                curtop += obj.offsetTop
+                break unless obj = obj.offsetParent
+            (x: curleft, y: curtop)
+
+        else undefined
+
 # Maths
 
 Math.direction = (p1, p2) -> new Vector2 p1.x - p2.x, p1.y - p2.y
@@ -31,47 +68,7 @@ Math.commonRangeCoefficient = (n, range, coefficient = 1) ->
 class Vector2
   constructor: (@x = 0, @y = 0) ->
 
-#
-# Assorted helper functions
-#
-
-color = (x = 1) ->
-    x = x() if x.call
-    '#'+("00000"+(x*16777216<<0).toString 16).substr(-6)
-
-clearCanvas = (canvas, ctx) -> ctx.clearRect 0, 0, canvas.width, canvas.height
-
-keyWasPressed = (e, code) ->
-    if window.event
-        window.event.keyCode is code
-    else
-        e.which is code
-
-cursorUpdater = (cursor, element) ->
-    (e) ->
-        x = y = 0
-        if e.pageX or e.pageY
-            x = e.pageX
-            y = e.pageY
-        else
-            x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
-            y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop
-        p = findElementPosition element
-        cursor.x = x - element.offsetLeft - p.x
-        cursor.y = y - element.offsetTop - p.y
-
-findElementPosition = (obj) ->
-    if obj.offsetParent
-        curleft = curtop = 0
-        loop
-            curleft += obj.offsetLeft
-            curtop += obj.offsetTop
-            break unless obj = obj.offsetParent
-        (x: curleft, y: curtop)
-
-    else
-        undefined
-
+# Et cetera.
 window.requestFrame = do ->
     window.requestAnimationFrame       or
     window.webkitRequestAnimationFrame or
