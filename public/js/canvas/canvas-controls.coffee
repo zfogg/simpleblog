@@ -54,7 +54,7 @@ class CanvasControls
 
   resets: []
 
-($ document).ready ->
+$ ->
   ($ "#canvas-controls-container").show()
   ($ "#toggle-menu a").click (event) ->
     if event.which is 1
