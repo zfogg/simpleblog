@@ -20,12 +20,12 @@ canvas {
 #canvas-controls-container {
   display: none;
   position: absolute;
-  left: -15px;
-  top: -60px;
+  left: 60px;
+  top: -85px;
 
   font-weight: bold;
   line-height: 0.15em;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 #canvas-controls p {
@@ -82,7 +82,6 @@ canvas {
   display: block;
 
   font-family: Impact, Charcoal, sans-serif;
-  font-weight: bold;
   border-radius: 8px;
   box-shadow: inset 2px 2px 4px rgb(50, 50, 90),
               inset -2px -2px 4px rgb(110, 140, 150);

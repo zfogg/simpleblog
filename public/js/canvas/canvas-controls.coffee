@@ -2,19 +2,19 @@
 
 class CanvasControls
     constructor: ->
-        @controls = document.getElementById "canvas-controls"
+        @controls = ($ "#canvas-controls")
 
     inputElement: (type, defaultValue) ->
         input = document.createElement "input"
         input.type = type
         input.value = defaultValue
-        @controls.appendChild input
+        @controls.append input
         input
 
     pElement: (text) ->
         p = document.createElement 'p'
         p.innerHTML = text
-        @controls.appendChild p
+        @controls.append p
         p
 
     NumberInput: (name, defaultValue) ->

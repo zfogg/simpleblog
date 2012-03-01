@@ -1,7 +1,6 @@
 header -> h1 @title
 
 div "#header-links", ->
-    h3 -> a href: "/", "Home"
 
 div "#canvas-container", ->
     link rel: "stylesheet", href: "/css/canvas.css"

@@ -1,7 +1,6 @@
 ###
 # Dependencies
 ###
-
 require "date-utils"
 express  = require "express"
 couchdb  = require "couchdb"
@@ -117,4 +116,4 @@ DATE_FORMAT_DB  = (d) -> d.toFormat "MM-DD-YYYY HH24:MI:SS"
 DATE_FORMAT_HTML = (d) -> d.getMonthName() + d.toFormat " DD, YYYY"
 
 # Start app.
-app.listen 5643
+app.listen 8000

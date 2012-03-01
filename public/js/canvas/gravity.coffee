@@ -1,235 +1,236 @@
 # Dependencies: canvas-controls, canvas-tools
 
 Gravity = (canvas) ->
-    ctx      = canvas.getContext  "2d"
-    gameTime = 0
-    squares  = []
+  ctx      = canvas.getContext  "2d"
+  gameTime = 0
+  squares  = []
 
-    defaultGravity        = 6.67 * Math.pow 10, -6
-    defaultFriction       = 1.15 * Math.pow 10, -4
-    defaultDistance       = 3
-    defaultCursorFriction = 25
-    defaultCursorMass     = 2500
-    defaultCursorForce    = 0.75
+  defaultGravity        = 6.67 * Math.pow 10, -6
+  defaultFriction       = 1.15 * Math.pow 10, -4
+  defaultDistance       = 3
+  defaultCursorFriction = 25
+  defaultCursorMass     = 2500
+  defaultCursorForce    = 0.75
 
-    class PhysicalBody
-        constructor: (@position = new Vector2, @mass = 1, @size = 1, @restitution = 1, @velocity = new Vector2) ->
+  class PhysicalBody
+    constructor: (@position = new Vector2, @mass = 1, @size = 1, @restitution = 1, @velocity = new Vector2) ->
 
-        updatePosition: ->
-            @position.x += @velocity.x
-            @position.y += @velocity.y
+    updatePosition: ->
+      @position.x += @velocity.x
+      @position.y += @velocity.y
 
-        applyForce: (acceleration) ->
-            @velocity.x += 0.5 * acceleration.x * @mass
-            @velocity.y += 0.5 * acceleration.y * @mass
+    applyForce: (acceleration) ->
+      @velocity.x += 0.5 * acceleration.x * @mass
+      @velocity.y += 0.5 * acceleration.y * @mass
 
-    class Square extends PhysicalBody
-        constructor: (@position, @mass, @size, @index, @color) ->
-            super @position, @mass, @size, 0.85
+  class Square extends PhysicalBody
+    constructor: (@position, @mass, @size, @index, @color) ->
+      super @position, @mass, @size, 0.85
 
-        update: (gameTime) ->
-            applyGravity @, cursor
-            if not cursor.isClicked.right and not cursor.isClicked.left
-                @bounceOffLimits canvas.width, canvas.height, @mass*2
-            do @updatePosition
-            @decayVelocity frictionControl.values.current
-            do @draw
+    update: (gameTime) ->
+      applyGravity @, cursor
+      if not cursor.isClicked.right and not cursor.isClicked.left
+        @bounceOffLimits canvas.width, canvas.height, @mass*2
+      do @updatePosition
+      @decayVelocity frictionControl.values.current
+      do @draw
 
-        decayVelocity: (n) ->
-            @velocity.x -= @velocity.x * n * @mass
-            @velocity.y -= @velocity.y * n * @mass
+    decayVelocity: (n) ->
+      @velocity.x -= @velocity.x * n * @mass
+      @velocity.y -= @velocity.y * n * @mass
 
-        draw: ->
-            ctx.fillStyle = @color
-            ctx.fillRect @position.x, @position.y, @mass, @mass
+    draw: ->
+      ctx.fillStyle = @color
+      ctx.fillRect @position.x, @position.y, @mass, @mass
 
-        bounceOffLimits: do ->
-            bounce = (dimension, coEf = 1) -> coEf * Math.abs dimension
-            (width, height, offset) ->
-                bounced = false
-                if @position.x > width - offset
-                    @velocity.x = -bounce @velocity.x
-                else if @position.x < 0 + offset
-                    @velocity.x = bounce @velocity.x
+    bounceOffLimits: do ->
+      bounce = (dimension, coEf = 1) -> coEf * Math.abs dimension
+      (width, height, offset) ->
+        bounced = false
+        if @position.x > width - offset
+          @velocity.x = -bounce @velocity.x
+        else if @position.x < 0 + offset
+          @velocity.x = bounce @velocity.x
 
-                if @position.y > height - offset
-                    @velocity.y = -bounce @velocity.y
-                else if @position.y < 0 + offset
-                    @velocity.y = bounce @velocity.y
+        if @position.y > height - offset
+          @velocity.y = -bounce @velocity.y
+        else if @position.y < 0 + offset
+          @velocity.y = bounce @velocity.y
 
-    class Cursor extends PhysicalBody
-        constructor: ->
-            @position        = new Vector2
-            @trackedPosition = new Vector2
-            @canvasCenter    = -> new Vector2 canvas.width / 2, canvas.height / 2
+  class Cursor extends PhysicalBody
+    constructor: ->
+      @position        = new Vector2
+      @trackedPosition = new Vector2
+      @canvasCenter    = new Vector2 canvas.width / 2, canvas.height / 2
 
-            ($ canvas).mousedown (e) => @toggleClicks e, true
-            ($ "body").mouseup   (e) => @toggleClicks e, false
-            ($ canvas).mousedown @mouseDown
-            ($ "body").mouseup   @mouseUp
-            ($ canvas).mousemove (CanvasTools.cursorUpdater @trackedPosition, canvas)
+      ($ canvas).mousedown (e) => @toggleClicks e, true
+      ($ "body").mouseup   (e) => @toggleClicks e, false
+      ($ canvas).mousedown @mouseDown
+      ($ "body").mouseup   @mouseUp
+      ($ canvas).mousemove (CanvasTools.cursorUpdater @trackedPosition, canvas)
 
-            super
+      super
 
-        isClicked:
-            left:   false
-            middle: false
-            right:  false
+    isClicked:
+      left:   false
+      middle: false
+      right:  false
 
-        toggleClicks: (e, value) =>
-            switch e.which
-                when 1 then @isClicked.left   = value
-                when 2 then @isClicked.middle = value
-                when 3 then @isClicked.right  = value
-            true
+    toggleClicks: (e, value) =>
+      switch e.which
+        when 1 then @isClicked.left   = value
+        when 2 then @isClicked.middle = value
+        when 3 then @isClicked.right  = value
+      true
 
-        mouseDown: =>
-            if @isClicked.left
-                @mass = cursorMassControl.values.getFromControl cursorMassControl
-                frictionControl.values.current = frictionControl.value / frictionControl.values.modifier * cursorFrictionControl.value
+    mouseDown: =>
+      if @isClicked.left
+        @mass = cursorMassControl.values.getFromControl cursorMassControl
+        frictionControl.values.current = frictionControl.value / frictionControl.values.modifier * cursorFrictionControl.value
 
-            else if @isClicked.right
-                @mass = 0.25 * cursorMassControl.values.getFromControl cursorMassControl
-                frictionControl.values.current = 0.2 * (frictionControl.value / frictionControl.values.modifier * cursorFrictionControl.value)
-            true
+      else if @isClicked.right
+        @mass = 0.25 * cursorMassControl.values.getFromControl cursorMassControl
+        frictionControl.values.current = 0.2 * (frictionControl.value / frictionControl.values.modifier * cursorFrictionControl.value)
 
-        mouseUp: =>
-            unless @isClicked.left
-                squares.forEach (s) =>
-                    if 75 > Math.distance s.position, @position
-                        s.applyForce forceTowards s.position, @position, cursorForceControl.values.getFromControl cursorForceControl
-                @mass = 0
-                frictionControl.values.setWithControl frictionControl
-                gravityControl.values.setWithControl gravityControl
+      true
 
-            @isClicked.left = @isClicked.middle = @isClicked.right = false
-            true
+    mouseUp: =>
+      unless @isClicked.left
+        squares.forEach (s) =>
+          if 75 > Math.distance s.position, @position
+            s.applyForce forceTowards s.position, @position, cursorForceControl.values.getFromControl cursorForceControl
 
-        rightHeldDown: =>
-            @position = do @canvasCenter
-            @position.x += (Math.sin gameTime / 14) * 124
-            @position.y += (Math.cos gameTime / 14) * 124
+        @mass = 0
+        frictionControl.values.setWithControl frictionControl
+        gravityControl.values.setWithControl gravityControl
 
-        updatePosition: ->
-            @position.x = @trackedPosition.x
-            @position.y = @trackedPosition.y
+      @isClicked.left = @isClicked.middle = @isClicked.right = false
+      true
 
-        update: ->
-            if @isClicked.right
-                do @rightHeldDown
-                do @draw
-            else do @updatePosition
+    rightHeldDown: =>
+      @position.x = @canvasCenter.x + (Math.sin gameTime / 14) * 124
+      @position.y = @canvasCenter.y + (Math.cos gameTime / 14) * 124
 
-        draw: ->
-            do ctx.beginPath
-            ctx.arc @position.x, @position.y, 10, 0, Math.PI*2, true
-            do ctx.closePath
-            do ctx.fill
+    updatePosition: ->
+      @position.x = @trackedPosition.x
+      @position.y = @trackedPosition.y
 
-    applyGravity = do ->
-        attractionOfGravity = (b1, b2) ->
-            d = Math.direction b1.position, b2.position
-            r = hypotenuse d.x, d.y
+    update: ->
+      if @isClicked.right
+        do @rightHeldDown
+        do @draw
+      else do @updatePosition
 
-            if r isnt 0 and r > distanceControl.values.current
-                g = gravity gravityControl.values.current, b1.mass, b2.mass, r
-                new Vector2 -d.x / r*g, -d.y / r*g
-            else do new Vector2
+    draw: ->
+      do ctx.beginPath
+      ctx.arc @position.x, @position.y, 10, 0, Math.PI*2, true
+      do ctx.closePath
+      do ctx.fill
 
-        gravity = (G, m1, m2, r) -> G*m1*m2 / r*r
-        negateVector2 = (v) -> new Vector2 -v.x, -v.y
+  applyGravity = do ->
+    attractionOfGravity = (b1, b2) ->
+      d = Math.direction b1.position, b2.position
+      r = hypotenuse d.x, d.y
 
-        (body1, body2) ->
-            f = attractionOfGravity body1, body2
-            body1.applyForce f
-            body2.applyForce negateVector2 f
+      if r isnt 0 and r > distanceControl.values.current
+        g = gravity gravityControl.values.current, b1.mass, b2.mass, r
+        new Vector2 -d.x / r*g, -d.y / r*g
+      else do new Vector2
 
-    forceTowards = (from, to, coEf = 1) ->
-        d = Math.direction from, to
-        r = hypotenuse d.x, d.y
-        new Vector2 -d.x/r * coEf, -d.y/r * coEf
+    gravity = (G, m1, m2, r) -> G*m1*m2 / r*r
+    negateVector2 = (v) -> new Vector2 -v.x, -v.y
 
-    mapOverUniquePairs = (f, set) ->
-        i = set.length
-        while j = --i
-            while j--
-                f set[i], set[j]
-        return
+    (body1, body2) ->
+      f = attractionOfGravity body1, body2
+      body1.applyForce f
+      body2.applyForce negateVector2 f
 
-    hypotenuseLookup = (digits, minSquare = 0, maxSquare) ->
-        sqrtTable = do ->
-            pow = Math.pow 10, digits
-            sqrts = (Math.sqrt x for x in [minSquare .. maxSquare * pow] by 1.0 / pow)
-            (n) -> sqrts[(n / 100 * pow) | 0] or Math.sqrt n
-        (a, b) -> sqrtTable (a*a + b*b)
+  forceTowards = (from, to, coEf = 1) ->
+    d = Math.direction from, to
+    r = hypotenuse d.x, d.y
+    new Vector2 -d.x/r * coEf, -d.y/r * coEf
 
-    # Returns a square of squares the size of the argument.
-    constructSquares = do ->
-        initPositions = (rows, columns) ->
-            position = (x, y) ->
-                new Vector2 x * canvas.width / columns, y * canvas.height / rows
-            position (n / columns) | 0, n % rows for n in [0...rows*columns]
+  mapOverUniquePairs = (f, set) ->
+    i = set.length
+    while j = --i
+      while j--
+        f set[i], set[j]
+    return
 
-        newSquare = (p, i, size) ->
-            new Square p, size, size, i, CanvasTools.color Math.random
+  hypotenuseLookup = (digits, minSquare = 0, maxSquare) ->
+    sqrtTable = do ->
+      pow = Math.pow 10, digits
+      sqrts = (Math.sqrt x for x in [minSquare .. maxSquare * pow] by 1.0 / pow)
+      (n) -> sqrts[(n / 100 * pow) | 0] or Math.sqrt n
+    (a, b) -> sqrtTable (a*a + b*b)
 
-        (rows, columns, size) ->
-            newSquare position, index, size for position, index in initPositions rows, columns
+  # Returns an n^2 grid of Squares, where n is the 'size' argument.
+  constructSquares = do ->
+    initPositions = (rows, columns) ->
+      position = (x, y) ->
+        new Vector2 x * canvas.width / columns, y * canvas.height / rows
+      position (n / columns) | 0, n % rows for n in [0...rows*columns]
 
-    resetSquares = (size) ->
-        cursor.isClicked.left = true
-        setTimeout (-> cursor.isClicked.left = false), 7000
-        constructSquares size, size, (Math.randomBetween 3, 6)
+    newSquare = (p, i, size) ->
+      new Square p, size, size, i, CanvasTools.color Math.random
 
-# Canvas Controls
-    controls     = new CanvasControls
-    controlValueRange = lower: 10, upper: 100
+    (rows, columns, size) ->
+      newSquare position, index, size for position, index in initPositions rows, columns
 
-    rangeInput = (name, defaultValue) ->
-        cValObj = controls.controlValueObj defaultValue, controlValueRange
-        control = controls.RangeInput(
-            name, cValObj.default * cValObj.modifier,
-            controlValueRange.lower, controlValueRange.upper, 3
-        )
-        ($ control).blur controls.propertyUpdater cValObj, "current", cValObj.modifier
-        control.values = cValObj
-        control
+  resetSquares = (size) ->
+    cursor.isClicked.left = true
+    setTimeout (-> cursor.isClicked.left = false), 7000
+    constructSquares size, size, (Math.randomBetween 3, 6)
 
-    gravityControl        = rangeInput "Gravitational Attraction",    defaultGravity
-    frictionControl       = rangeInput "Atmospheric Friction",        defaultFriction
-    distanceControl       = rangeInput "Gravity Deadzone Radius",     defaultDistance
-    cursorFrictionControl = rangeInput "Cursor Friction Coefficient", defaultCursorFriction
-    cursorMassControl     = rangeInput "Cursor Body Mass",            defaultCursorMass
-    cursorForceControl    = rangeInput "Cursor Release Force",        defaultCursorForce
+  # Canvas Controls
+  controls          = new CanvasControls
+  controlValueRange = lower: 10, upper: 100
 
-    defaultButton = controls.ButtonInput "Defaults Values"
-    ($ defaultButton).click -> controls.resets.forEach (x) -> do x
+  rangeInput = (name, defaultValue) ->
+    cValObj = controls.controlValueObj defaultValue, controlValueRange
+    control = controls.RangeInput(
+      name, cValObj.default * cValObj.modifier,
+      controlValueRange.lower, controlValueRange.upper, 3
+    )
+    ($ control).blur controls.propertyUpdater cValObj, "current", cValObj.modifier
+    control.values = cValObj
+    control
 
-    particleCountControl = controls.NumberInput "Rows of Squares", 16
-    ($ particleCountControl).blur controls.controlLimit (lower: 1, upper: 30)
+  gravityControl        = rangeInput "Gravitational Attraction",    defaultGravity
+  frictionControl       = rangeInput "Atmospheric Friction",        defaultFriction
+  distanceControl       = rangeInput "Gravity Deadzone Radius",     defaultDistance
+  cursorFrictionControl = rangeInput "Cursor Friction Coefficient", defaultCursorFriction
+  cursorMassControl     = rangeInput "Cursor Body Mass",            defaultCursorMass
+  cursorForceControl    = rangeInput "Cursor Release Force",        defaultCursorForce
 
-    resetButton = controls.ButtonInput("Reset Squares")
-    ($ resetButton).click (e) -> squares = resetSquares particleCountControl.value
+  defaultButton = controls.ButtonInput "Default Values"
+  ($ defaultButton).click -> controls.resets.forEach (x) -> do x
 
-# Init.
-    hypotenuse = hypotenuseLookup 3, 0, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
-    cursor     = new Cursor
-    squares    = resetSquares 16
+  particleCountControl = controls.NumberInput "Rows of Squares", 16
+  ($ particleCountControl).blur controls.controlLimit (lower: 1, upper: 30)
 
-    do main = ->
-        CanvasTools.clearCanvas canvas, ctx
-        do cursor.update
+  resetButton = controls.ButtonInput("Reset Squares")
+  ($ resetButton).click (e) -> squares = resetSquares particleCountControl.value
 
-        mapOverUniquePairs applyGravity, squares
-        square.update gameTime for square in squares
+  # Init.
+  hypotenuse = hypotenuseLookup 3, 0, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
+  cursor     = new Cursor
+  squares    = resetSquares 16
 
-        gameTime++
-        window.requestFrame main, canvas
+  do main = ->
+    CanvasTools.clearCanvas canvas, ctx
+    do cursor.update
 
-window.onload = ->
-    canvas        = document.getElementById "canvas"
-    canvas.width  = 800
-    canvas.height = 480
+    mapOverUniquePairs applyGravity, squares
+    square.update gameTime for square in squares
 
-    if canvas.getContext
-        Gravity canvas
+    gameTime++
+    requestFrame main, canvas
+
+$ ->
+  canvas        = document.getElementById "canvas"
+  canvas.width  = 800
+  canvas.height = 480
+
+  if canvas.getContext
+    Gravity canvas

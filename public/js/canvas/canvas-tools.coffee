@@ -1,3 +1,4 @@
+# A collection of tools to assist in canvas development.
 CanvasTools =
 
     color: (x = 1) ->
