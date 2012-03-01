@@ -1,5 +1,5 @@
 # A collection of tools to assist in canvas development.
-CanvasTools =
+C$ =
 
     color: (x = 1) ->
         x = x() if x.call
@@ -21,7 +21,7 @@ CanvasTools =
             else
                 x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
                 y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop
-            p = CanvasTools.findElementPosition element
+            p = C$.findElementPosition element
             cursor.x = x - element.offsetLeft - p.x
             cursor.y = y - element.offsetTop - p.y
 
@@ -35,6 +35,9 @@ CanvasTools =
             (x: curleft, y: curtop)
 
         else undefined
+
+    $Id: (id) ->
+      document.getElementById id
 
 # Maths
 
@@ -77,3 +80,4 @@ window.requestFrame = do ->
     window.oRequestAnimationFrame      or
     window.msRequestAnimationFrame     or
     (callback, element) -> window.setTimeout callback, 1000 / 60
+

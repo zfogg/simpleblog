@@ -67,7 +67,9 @@ Gravity = (canvas) ->
       ($ "body").mouseup   (e) => @toggleClicks e, false
       ($ canvas).mousedown @mouseDown
       ($ "body").mouseup   @mouseUp
-      ($ canvas).mousemove (CanvasTools.cursorUpdater @trackedPosition, canvas)
+      (C$.$Id "canvas").onmousemove =
+        # Because jQuery uses depracated code, throwing ugly warnings in Webkit.
+        C$.cursorUpdater @trackedPosition, canvas
 
       super
 
@@ -169,15 +171,17 @@ Gravity = (canvas) ->
   # Returns an n^2 grid of Squares, where n is the 'size' argument.
   constructSquares = do ->
     initPositions = (rows, columns) ->
-      position = (x, y) ->
-        new Vector2 x * canvas.width / columns, y * canvas.height / rows
-      position (n / columns) | 0, n % rows for n in [0...rows*columns]
+      for n in [0...rows*columns]
+        new Vector2 \
+          (n / columns | 0) * canvas.width / columns,
+          (n % rows) * canvas.height / rows
 
     newSquare = (p, i, size) ->
-      new Square p, size, size, i, CanvasTools.color Math.random
+      new Square p, size, size, i, C$.color Math.random
 
     (rows, columns, size) ->
-      newSquare position, index, size for position, index in initPositions rows, columns
+      for position, index in initPositions rows, columns
+        newSquare position, index, size
 
   resetSquares = (size) ->
     cursor.isClicked.left = true
@@ -190,10 +194,10 @@ Gravity = (canvas) ->
 
   rangeInput = (name, defaultValue) ->
     cValObj = controls.controlValueObj defaultValue, controlValueRange
-    control = controls.RangeInput(
+    control = controls.RangeInput \
       name, cValObj.default * cValObj.modifier,
       controlValueRange.lower, controlValueRange.upper, 3
-    )
+
     ($ control).blur controls.propertyUpdater cValObj, "current", cValObj.modifier
     cValObj.self = control
     control.values = cValObj
@@ -207,13 +211,15 @@ Gravity = (canvas) ->
   CC_cursorForce    = rangeInput "Cursor Release Force",        defaultCursorForce
 
   CC_defaultButton = controls.ButtonInput "Default Values"
-  ($ CC_defaultButton).click -> controls.resets.forEach (x) -> x()
+  ($ CC_defaultButton).click ->
+    x() for x in controls.resets
 
   CC_particleCount = controls.NumberInput "Rows of Squares", 16
   ($ CC_particleCount).blur controls.controlLimit (lower: 1, upper: 30)
 
   CC_resetButton = controls.ButtonInput("Reset Squares")
-  ($ CC_resetButton).click (e) -> squares = resetSquares CC_particleCount.value
+  ($ CC_resetButton).click (e) ->
+    squares = resetSquares CC_particleCount.value
 
   # Init.
   hypotenuse = hypotenuseLookup 3, 0, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
@@ -221,7 +227,7 @@ Gravity = (canvas) ->
   squares    = resetSquares 16
 
   do main = ->
-    CanvasTools.clearCanvas canvas, ctx
+    C$.clearCanvas canvas, ctx
     cursor.update()
 
     mapPairs applyGravity, squares
