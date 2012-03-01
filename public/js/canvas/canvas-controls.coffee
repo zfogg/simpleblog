@@ -48,8 +48,9 @@ class CanvasControls
             default:        value
             current:        value
             modifier:       Math.commonRangeCoefficient value, limitRange
-            setWithControl: (control) -> @current = control.value / @modifier
-            getFromControl: (control) -> control.value / @modifier
+            setFromControl: -> @.current = @.getFromControl()
+            getFromControl: (control = @self) -> control.value / @modifier
+            # self: set this to the parent object if you like.
         )
 
     resets: []

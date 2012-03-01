@@ -31,9 +31,9 @@ Gravity = (canvas) ->
       applyGravity @, cursor
       if not cursor.isClicked.right and not cursor.isClicked.left
         @bounceOffLimits canvas.width, canvas.height, @mass*2
-      do @updatePosition
-      @decayVelocity frictionControl.values.current
-      do @draw
+      @updatePosition()
+      @decayVelocity CC_friction.values.current
+      @draw()
 
     decayVelocity: (n) ->
       @velocity.x -= @velocity.x * n * @mass
@@ -85,12 +85,14 @@ Gravity = (canvas) ->
 
     mouseDown: =>
       if @isClicked.left
-        @mass = cursorMassControl.values.getFromControl cursorMassControl
-        frictionControl.values.current = frictionControl.value / frictionControl.values.modifier * cursorFrictionControl.value
+        @mass = CC_cursorMass.values.getFromControl()
+        CC_friction.values.current =
+          CC_friction.value / CC_friction.values.modifier * CC_cursorFriction.value
 
       else if @isClicked.right
-        @mass = 0.25 * cursorMassControl.values.getFromControl cursorMassControl
-        frictionControl.values.current = 0.2 * (frictionControl.value / frictionControl.values.modifier * cursorFrictionControl.value)
+        @mass = 0.25 * CC_cursorMass.values.getFromControl()
+        CC_friction.values.current =
+          0.2 * (CC_friction.value / CC_friction.values.modifier * CC_cursorFriction.value)
 
       true
 
@@ -98,11 +100,11 @@ Gravity = (canvas) ->
       unless @isClicked.left
         squares.forEach (s) =>
           if 75 > Math.distance s.position, @position
-            s.applyForce forceTowards s.position, @position, cursorForceControl.values.getFromControl cursorForceControl
+            s.applyForce forceTowards s.position, @position, CC_cursorForce.values.getFromControl()
 
         @mass = 0
-        frictionControl.values.setWithControl frictionControl
-        gravityControl.values.setWithControl gravityControl
+        CC_friction.values.setFromControl()
+        CC_gravity.values.setFromControl()
 
       @isClicked.left = @isClicked.middle = @isClicked.right = false
       true
@@ -117,25 +119,25 @@ Gravity = (canvas) ->
 
     update: ->
       if @isClicked.right
-        do @rightHeldDown
-        do @draw
-      else do @updatePosition
+        @rightHeldDown()
+        @draw()
+      else @updatePosition()
 
     draw: ->
-      do ctx.beginPath
+      ctx.beginPath()
       ctx.arc @position.x, @position.y, 10, 0, Math.PI*2, true
-      do ctx.closePath
-      do ctx.fill
+      ctx.closePath()
+      ctx.fill()
 
   applyGravity = do ->
     attractionOfGravity = (b1, b2) ->
       d = Math.direction b1.position, b2.position
       r = hypotenuse d.x, d.y
 
-      if r isnt 0 and r > distanceControl.values.current
-        g = gravity gravityControl.values.current, b1.mass, b2.mass, r
+      if r isnt 0 and r > CC_distance.values.current
+        g = gravity CC_gravity.values.current, b1.mass, b2.mass, r
         new Vector2 -d.x / r*g, -d.y / r*g
-      else do new Vector2
+      else new Vector2
 
     gravity = (G, m1, m2, r) -> G*m1*m2 / r*r
     negateVector2 = (v) -> new Vector2 -v.x, -v.y
@@ -193,24 +195,25 @@ Gravity = (canvas) ->
       controlValueRange.lower, controlValueRange.upper, 3
     )
     ($ control).blur controls.propertyUpdater cValObj, "current", cValObj.modifier
+    cValObj.self = control
     control.values = cValObj
     control
 
-  gravityControl        = rangeInput "Gravitational Attraction",    defaultGravity
-  frictionControl       = rangeInput "Atmospheric Friction",        defaultFriction
-  distanceControl       = rangeInput "Gravity Deadzone Radius",     defaultDistance
-  cursorFrictionControl = rangeInput "Cursor Friction Coefficient", defaultCursorFriction
-  cursorMassControl     = rangeInput "Cursor Body Mass",            defaultCursorMass
-  cursorForceControl    = rangeInput "Cursor Release Force",        defaultCursorForce
+  CC_gravity        = rangeInput "Gravitational Attraction",    defaultGravity
+  CC_friction       = rangeInput "Atmospheric Friction",        defaultFriction
+  CC_distance       = rangeInput "Gravity Deadzone Radius",     defaultDistance
+  CC_cursorFriction = rangeInput "Cursor Friction Coefficient", defaultCursorFriction
+  CC_cursorMass     = rangeInput "Cursor Body Mass",            defaultCursorMass
+  CC_cursorForce    = rangeInput "Cursor Release Force",        defaultCursorForce
 
-  defaultButton = controls.ButtonInput "Default Values"
-  ($ defaultButton).click -> controls.resets.forEach (x) -> do x
+  CC_defaultButton = controls.ButtonInput "Default Values"
+  ($ CC_defaultButton).click -> controls.resets.forEach (x) -> x()
 
-  particleCountControl = controls.NumberInput "Rows of Squares", 16
-  ($ particleCountControl).blur controls.controlLimit (lower: 1, upper: 30)
+  CC_particleCount = controls.NumberInput "Rows of Squares", 16
+  ($ CC_particleCount).blur controls.controlLimit (lower: 1, upper: 30)
 
-  resetButton = controls.ButtonInput("Reset Squares")
-  ($ resetButton).click (e) -> squares = resetSquares particleCountControl.value
+  CC_resetButton = controls.ButtonInput("Reset Squares")
+  ($ CC_resetButton).click (e) -> squares = resetSquares CC_particleCount.value
 
   # Init.
   hypotenuse = hypotenuseLookup 3, 0, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
@@ -219,7 +222,7 @@ Gravity = (canvas) ->
 
   do main = ->
     CanvasTools.clearCanvas canvas, ctx
-    do cursor.update
+    cursor.update()
 
     mapPairs applyGravity, squares
     square.update gameTime for square in squares
