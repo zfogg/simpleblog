@@ -150,7 +150,7 @@ Gravity = (canvas) ->
     r = hypotenuse d.x, d.y
     new Vector2 -d.x/r * coEf, -d.y/r * coEf
 
-  mapOverUniquePairs = (f, set) ->
+  mapPairs = (f, set) ->
     i = set.length
     while j = --i
       while j--
@@ -221,14 +221,14 @@ Gravity = (canvas) ->
     CanvasTools.clearCanvas canvas, ctx
     do cursor.update
 
-    mapOverUniquePairs applyGravity, squares
+    mapPairs applyGravity, squares
     square.update gameTime for square in squares
 
     gameTime++
     requestFrame main, canvas
 
 $ ->
-  canvas        = document.getElementById "canvas"
+  canvas        = ($ "#canvas")[0]
   canvas.width  = 800
   canvas.height = 480
 
