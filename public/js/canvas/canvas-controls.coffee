@@ -1,6 +1,6 @@
 # Dependencies: canvas-tools
 
-class CanvasControls
+window.CanvasControls = class
   constructor: ->
     @controls = ($ "#canvas-controls")
 
@@ -39,16 +39,16 @@ class CanvasControls
     button
 
   controlLimit: (limit) ->
-    -> @value = Math.clipValues @value, limit.lower, limit.upper
+    -> @value = C$.Math.clipValues @value, limit.lower, limit.upper
 
   propertyUpdater: (obj, objProperty, modifier = 1) ->
     -> obj[objProperty] = @value / modifier
 
   controlValueObj: (value, limitRange) ->
-    default:        value
-    current:        value
-    modifier:       Math.commonRangeCoefficient value, limitRange
-    setFromControl: -> @.current = @.getFromControl()
+    default: value
+    current: value
+    modifier: C$.Math.commonRangeCoefficient value, limitRange
+    setFromControl: -> @current = @getFromControl()
     getFromControl: (control = @self) -> control.value / @modifier
     # self: set this to the parent object after creation if you like.
 

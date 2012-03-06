@@ -5,15 +5,19 @@ Gravity = (canvas) ->
   gameTime = 0
   squares  = []
 
-  defaultGravity        = 6.67 * Math.pow 10, -6
-  defaultFriction       = 1.15 * Math.pow 10, -4
-  defaultDistance       = 3
-  defaultCursorFriction = 25
-  defaultCursorMass     = 2500
-  defaultCursorForce    = 0.75
+  defaultGravity        = (C$.Math.randomBetween 4, 8) * Math.pow 10, -6
+  defaultFriction       = (C$.Math.randomBetween 3, 7) * Math.pow 10, -4
+  defaultDistance       = (C$.Math.randomBetween 4, 6)
+  defaultCursorFriction = 1
+  defaultCursorMass     = [500..2000].random()
+  defaultCursorForce    = 0.65
+
+  # An alias or two.
+  V2                    = C$.Vector2
+  PHI                   = C$.Math.PHI
 
   class PhysicalBody
-    constructor: (@position = new Vector2, @mass = 1, @size = 1, @restitution = 1, @velocity = new Vector2) ->
+    constructor: (@position = new V2, @mass = 1, @size = 1, @restitution = 1, @velocity = new V2) ->
 
     updatePosition: ->
       @position.x += @velocity.x
@@ -41,7 +45,7 @@ Gravity = (canvas) ->
 
     draw: ->
       ctx.fillStyle = @color
-      ctx.fillRect @position.x, @position.y, @mass, @mass
+      ctx.fillRect @position.x, @position.y, @size, @size
 
     bounceOffLimits: do ->
       bounce = (dimension, coEf = 1) -> coEf * Math.abs dimension
@@ -59,17 +63,15 @@ Gravity = (canvas) ->
 
   class Cursor extends PhysicalBody
     constructor: ->
-      @position        = new Vector2
-      @trackedPosition = new Vector2
-      @canvasCenter    = new Vector2 canvas.width / 2, canvas.height / 2
+      @position        = new V2
+      @trackedPosition = new V2
+      @canvasCenter    = new V2 canvas.width / 2, canvas.height / 2
 
       ($ canvas).mousedown (e) => @toggleClicks e, true
       ($ "body").mouseup   (e) => @toggleClicks e, false
       ($ canvas).mousedown @mouseDown
       ($ "body").mouseup   @mouseUp
-      (C$.$Id "canvas").onmousemove =
-        # Because jQuery uses depracated code, throwing ugly warnings in Webkit.
-        C$.cursorUpdater @trackedPosition, canvas
+      ($ "canvas").mousemove C$.cursorUpdater @trackedPosition, canvas
 
       super
 
@@ -101,7 +103,7 @@ Gravity = (canvas) ->
     mouseUp: =>
       unless @isClicked.left
         squares.forEach (s) =>
-          if 75 > Math.distance s.position, @position
+          if 75 > C$.Math.distance s.position, @position
             s.applyForce forceTowards s.position, @position, CC_cursorForce.values.getFromControl()
 
         @mass = 0
@@ -133,26 +135,26 @@ Gravity = (canvas) ->
 
   applyGravity = do ->
     attractionOfGravity = (b1, b2) ->
-      d = Math.direction b1.position, b2.position
+      d = C$.Math.direction b1.position, b2.position
       r = hypotenuse d.x, d.y
 
       if r isnt 0 and r > CC_distance.values.current
         g = gravity CC_gravity.values.current, b1.mass, b2.mass, r
-        new Vector2 -d.x / r*g, -d.y / r*g
-      else new Vector2
+        new V2 -d.x / r*g, -d.y / r*g
+      else new V2
 
     gravity = (G, m1, m2, r) -> G*m1*m2 / r*r
-    negateVector2 = (v) -> new Vector2 -v.x, -v.y
+    negateV2 = (v) -> new V2 -v.x, -v.y
 
     (body1, body2) ->
       f = attractionOfGravity body1, body2
       body1.applyForce f
-      body2.applyForce negateVector2 f
+      body2.applyForce negateV2 f
 
   forceTowards = (from, to, coEf = 1) ->
-    d = Math.direction from, to
+    d = C$.Math.direction from, to
     r = hypotenuse d.x, d.y
-    new Vector2 -d.x/r * coEf, -d.y/r * coEf
+    new V2 -d.x/r * coEf, -d.y/r * coEf
 
   mapPairs = (f, set) ->
     i = set.length
@@ -164,29 +166,35 @@ Gravity = (canvas) ->
   hypotenuseLookup = (digits, minSquare = 0, maxSquare) ->
     sqrtTable = do ->
       pow = Math.pow 10, digits
-      sqrts = (Math.sqrt x for x in [minSquare .. maxSquare * pow] by 1.0 / pow)
-      (n) -> sqrts[(n / 100 * pow) | 0] or Math.sqrt n
+      sqrts = new Float32Array \
+        (Math.sqrt x for x in [minSquare .. maxSquare * pow] by 1.0 / pow)
+      window.sqrts = sqrts
+      (n) -> sqrts[(n / 100 * pow) | 0]
     (a, b) -> sqrtTable (a*a + b*b)
 
   # Returns an n^2 grid of Squares, where n is the 'size' argument.
   constructSquares = do ->
     initPositions = (rows, columns) ->
       for n in [0...rows*columns]
-        new Vector2 \
+        new V2 \
           (n / columns | 0) * canvas.width / columns,
           (n % rows) * canvas.height / rows
 
     newSquare = (p, i, size) ->
-      new Square p, size, size, i, C$.color Math.random
+      new Square p, size*PHI/2, size, i, C$.color Math.random
 
     (rows, columns, size) ->
       for position, index in initPositions rows, columns
-        newSquare position, index, size
+        newSquare position, index, (if size.call then size() else size)
 
-  resetSquares = (size) ->
+  resetSquares = (gridSize) ->
     cursor.isClicked.left = true
     setTimeout (-> cursor.isClicked.left = false), 7000
-    constructSquares size, size, (Math.randomBetween 3, 6)
+
+    size = if [true, false].random()
+    then -> (x*PHI for x in [3.25..4.75] by 0.125).random()
+    else [3..6].random()
+    constructSquares gridSize, gridSize, size
 
   # Canvas Controls
   controls          = new CanvasControls
@@ -238,8 +246,9 @@ Gravity = (canvas) ->
 
 $ ->
   canvas        = ($ "#canvas")[0]
-  canvas.width  = 800
   canvas.height = 480
+  canvas.width  = 800
 
   if canvas.getContext
+    WebGL2D.enable canvas
     Gravity canvas

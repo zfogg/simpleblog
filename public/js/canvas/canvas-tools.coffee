@@ -1,5 +1,6 @@
 # A collection of tools to assist in canvas development.
-C$ =
+
+window.C$ =
 
   color: (x = 1) ->
     x = x() if x.call
@@ -37,42 +38,44 @@ C$ =
 
     else undefined
 
-  $Id: (id) ->
-    document.getElementById id
+  Math:
 
-# Maths
+    PHI: 1/2*(1 + Math.sqrt 5)
 
-Math.direction = (p1, p2) ->
-  new Vector2 p1.x - p2.x, p1.y - p2.y
+    direction: (p1, p2) ->
+      new C$.Vector2 p1.x - p2.x, p1.y - p2.y
 
-Math.hypotenuse = (a, b) ->
-  Math.sqrt a*a + b*b
+    hypotenuse: (a, b) ->
+      Math.sqrt a*a + b*b
 
-Math.distance = (p1, p2) ->
-  d = Math.direction p1, p2
-  Math.hypotenuse d.x, d.y
+    distance: (p1, p2) ->
+      d = @direction p1, p2
+      @hypotenuse d.x, d.y
 
-Math.roundDigits = (n, digits) ->
-  parseFloat \
+    roundDigits: (n, digits) ->
+      parseFloat \
         ((Math.round (n * (Math.pow 10, digits)).toFixed(digits-1)) / (Math.pow 10,digits)).toFixed digits
 
-Math.randomBetween = (min, max) -> Math.random() * (max - min) + min
+    randomBetween: (min, max) -> Math.random() * (max - min) + min
 
-Math.clipValues = (value, lower, upper) ->
-  if value >= lower and value <= upper
-    value
-  else
-    if value < lower then lower else upper
+    clipValues: (value, lower, upper) ->
+      if value >= lower and value <= upper
+        value
+      else
+        if value < lower then lower else upper
 
-Math.commonRangeCoefficient = (n, range, coefficient = 1) ->
-  if n < range.lower
-    Math.commonRangeCoefficient n * 10, range, coefficient * 10
-  else if n > range.upper
-    Math.commonRangeCoefficient n / 10, range, coefficient / 10
-  else coefficient
+    commonRangeCoefficient: (n, range, coefficient = 1) ->
+      if n < range.lower
+        @commonRangeCoefficient n * 10, range, coefficient * 10
+      else if n > range.upper
+        @commonRangeCoefficient n / 10, range, coefficient / 10
+      else coefficient
 
-class Vector2
-  constructor: (@x = 0, @y = 0) ->
+  # Classes
+  Vector2: class
+    constructor: (@x = 0, @y = 0) ->
+
+
 
 # Et cetera.
 window.requestFrame = do ->
@@ -82,3 +85,11 @@ window.requestFrame = do ->
   window.oRequestAnimationFrame      or
   window.msRequestAnimationFrame     or
   (callback, element) -> window.setTimeout callback, 1000 / 60
+
+Array::random = ->
+  @[Math.random() * @length | 0]
+
+Array::toSet = ->
+  s = {}
+  s[x] = i for x,i in @
+  @[v] for k,v of s

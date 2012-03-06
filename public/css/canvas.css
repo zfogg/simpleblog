@@ -7,7 +7,6 @@ body {
 
 #canvas-container {
   position: relative;
-  max-width: 800px;
   margin: 0 auto;
   display: block;
 }
@@ -18,14 +17,14 @@ canvas {
 }
 
 #canvas-controls-container {
-  display: none;
+  display: none; /* Your script can enable this if you need controls. */
   position: absolute;
   left: 60px;
-  top: -85px;
+  top: -50px;
 
   font-weight: bold;
   line-height: 0.15em;
-  font-size: 12px;
+  font-size: 13.5px;
 }
 
 #canvas-controls p {
@@ -51,7 +50,7 @@ canvas {
   max-width: 160px;
   background: rgba(0, 0, 0, 0.85);
   padding: 7px;
-  margin: 40px 0.75em 0.75em;
+  margin-top: 25px;
   border-radius: 4px;
   box-shadow: 3px 3px 6px rgb(50, 50, 90),
               -4px -4px 12px rgb(110, 140, 150);
@@ -87,6 +86,7 @@ canvas {
               inset -2px -2px 4px rgb(110, 140, 150);
 }
 
+#toggle-menu { font-size: 1.61em; }
 #toggle-menu a {
   text-transform: capitalize;
   text-decoration: underline;

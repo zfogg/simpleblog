@@ -7,11 +7,12 @@ div "#canvas-container", ->
     canvas id: "canvas", oncontextmenu: "return false;"
 
     div "#canvas-controls-container", ->
-        div id: "canvas-controls", -> h3 "Canvas Controls"
         h3 id: "toggle-menu", ->
             a "Show"
             text " controls."
+        div id: "canvas-controls", -> h3 "Canvas Controls"
 
+    script src: "/js/libs/webgl-2d.js"
     script src: "/js/canvas/canvas-tools.js"
     script src: "/js/canvas/canvas-controls.js"
     script src: "/js/canvas/#{@title}.js"
