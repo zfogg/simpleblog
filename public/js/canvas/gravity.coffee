@@ -1,7 +1,8 @@
 # Dependencies: canvas-controls, canvas-tools
 
 Gravity = (canvas) ->
-  ctx      = canvas.getContext  "2d"
+  ctx = canvas.getContext "2d"
+
   gameTime = 0
   squares  = []
 
@@ -14,7 +15,6 @@ Gravity = (canvas) ->
 
   # An alias or two.
   V2                    = C$.Vector2
-  PHI                   = C$.Math.PHI
 
   class PhysicalBody
     constructor: (@position = new V2, @mass = 1, @size = 1, @restitution = 1, @velocity = new V2) ->
@@ -37,13 +37,13 @@ Gravity = (canvas) ->
         @bounceOffLimits canvas.width, canvas.height, @mass*2
       @updatePosition()
       @decayVelocity CC_friction.values.current
-      @draw()
+      @draw(ctx)
 
     decayVelocity: (n) ->
       @velocity.x -= @velocity.x * n * @mass
       @velocity.y -= @velocity.y * n * @mass
 
-    draw: ->
+    draw: (ctx) ->
       ctx.fillStyle = @color
       ctx.fillRect @position.x, @position.y, @size, @size
 
@@ -124,10 +124,10 @@ Gravity = (canvas) ->
     update: ->
       if @isClicked.right
         @rightHeldDown()
-        @draw()
+        @draw(ctx)
       else @updatePosition()
 
-    draw: ->
+    draw: (ctx) ->
       ctx.beginPath()
       ctx.arc @position.x, @position.y, 10, 0, Math.PI*2, true
       ctx.closePath()
@@ -163,15 +163,6 @@ Gravity = (canvas) ->
         f set[i], set[j]
     return
 
-  hypotenuseLookup = (digits, minSquare = 0, maxSquare) ->
-    sqrtTable = do ->
-      pow = Math.pow 10, digits
-      sqrts = new Float32Array \
-        (Math.sqrt x for x in [minSquare .. maxSquare * pow] by 1.0 / pow)
-      window.sqrts = sqrts
-      (n) -> sqrts[(n / 100 * pow) | 0]
-    (a, b) -> sqrtTable (a*a + b*b)
-
   # Returns an n^2 grid of Squares, where n is the 'size' argument.
   constructSquares = do ->
     initPositions = (rows, columns) ->
@@ -181,7 +172,7 @@ Gravity = (canvas) ->
           (n % rows) * canvas.height / rows
 
     newSquare = (p, i, size) ->
-      new Square p, size*PHI/2, size, i, C$.color Math.random
+      new Square p, size*C$.Math.PHI/2, size, i, C$.color Math.random
 
     (rows, columns, size) ->
       for position, index in initPositions rows, columns
@@ -192,7 +183,7 @@ Gravity = (canvas) ->
     setTimeout (-> cursor.isClicked.left = false), 7000
 
     size = if [true, false].random()
-    then -> (x*PHI for x in [3.25..4.75] by 0.125).random()
+    then -> (x*C$.Math.PHI for x in [3.25..4.75] by 0.125).random()
     else [3..6].random()
     constructSquares gridSize, gridSize, size
 
@@ -230,7 +221,9 @@ Gravity = (canvas) ->
     squares = resetSquares CC_particleCount.value
 
   # Init.
-  hypotenuse = hypotenuseLookup 3, 0, ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
+  hypotenuse = C$.Math.hypotenuseLookup 3, 0,
+    ((Math.pow canvas.width, 2) + (Math.pow canvas.height, 2)) / Math.pow 10, 5
+    Float64Array
   cursor     = new Cursor
   squares    = resetSquares 16
 
@@ -250,5 +243,4 @@ $ ->
   canvas.width  = 800
 
   if canvas.getContext
-    WebGL2D.enable canvas
     Gravity canvas
