@@ -13,13 +13,6 @@ Fn =
       x = f x for f in fs.reverse().tail()
       x
 
- #curry :: (a... -> b... -> c) -> a... -> (b... -> c)
-  curry: (f, args1...) -> (args2...) ->
-    f.apply null, args1.concat args2
- #flip :: (a... -> b... -> c) -> b... -> (a... -> c)
-  flip: (f, args1...) -> (args2...) ->
-    f.apply null, (args1.concat args2).reverse()
-
   take: (n, xs) -> xs[0...n]
   drop: (n, xs) -> xs[n..]
 
@@ -48,8 +41,37 @@ Fn =
 
  #memoize :: (-> [a]) -> (b -> Integer) -> (b -> a)
   memoize: (compose, hash = Fn.id) ->
-    Fn.curry ((xs, x) -> xs[hash x]), compose()
+    Fn.partial ((xs, x) -> xs[hash x]), compose()
 
+ #partial :: (a... -> b... -> c) -> a... -> (b... -> c)
+  partial: (f, args1...) -> (args2...) ->
+    f.apply @, args1.concat args2
+ #flip :: (a... -> b... -> c) -> b... -> (a... -> c)
+  flip: (f, args1...) -> (args2...) ->
+    f.apply @, (args1.concat args2).reverse()
+
+  Currier: class
+    constructor: (@f, @args...) ->
+
+    curry: (args...) =>
+      @args.push x for x in args
+      @curry
+
+    end: (that = null) =>
+      @f.apply that, @args
+
+  nCurry: (n, f, args...) ->
+    f$ = new Fn.Currier f
+    f$.curry.apply this, args
+    nCurry$ = (n, args...) ->
+      f$.curry.apply f, args
+      if (n -= args.length) > 0
+        Fn.partial nCurry$, n
+      else f$.end()
+    nCurry$ n - args.length
+
+Function::curry = (args...) ->
+  Fn.nCurry.apply @, [@length, @].concat args
 
 $Math =
 
@@ -94,8 +116,8 @@ $Math =
     else coefficient
 
   # Array maths.
-  sum:     do -> Fn.curry Fn.fold1, ((x,y) -> x+y)
-  product: do -> Fn.curry Fn.fold1, ((x,y) -> x*y)
+  sum:     do -> Fn.partial Fn.fold1, ((x,y) -> x+y)
+  product: do -> Fn.partial Fn.fold1, ((x,y) -> x*y)
 
   factorial: (n) ->
     $Math.product [1..n]
@@ -163,14 +185,16 @@ window.C$ =
         curleft += obj.offsetLeft
         curtop += obj.offsetTop
         break unless obj = obj.offsetParent
-      (x: curleft, y: curtop)
+      new C$.Vector2 curleft, curtop
 
     else undefined
 
   # Classes
 
   Vector2: class
-    constructor: (@x = 0, @y = 0) ->
+    constructor: (@x, @y) ->
+
+    Zero: -> new C$.Vector2 0, 0
 
 window.requestFrame = do ->
   window.requestAnimationFrame       or

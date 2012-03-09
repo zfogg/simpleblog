@@ -17,7 +17,7 @@ Gravity = (canvas) ->
   V2                    = C$.Vector2
 
   class PhysicalBody
-    constructor: (@position = new V2, @mass = 1, @size = 1, @restitution = 1, @velocity = new V2) ->
+    constructor: (@position = V2::Zero(), @mass = 1, @size = 1, @restitution = 1, @velocity = V2::Zero()) ->
 
     updatePosition: ->
       @position.x += @velocity.x
@@ -63,8 +63,8 @@ Gravity = (canvas) ->
 
   class Cursor extends PhysicalBody
     constructor: ->
-      @position        = new V2
-      @trackedPosition = new V2
+      @position        = V2::Zero()
+      @trackedPosition = V2::Zero()
       @canvasCenter    = new V2 canvas.width / 2, canvas.height / 2
 
       ($ canvas).mousedown (e) => @toggleClicks e, true
@@ -141,7 +141,7 @@ Gravity = (canvas) ->
       if r isnt 0 and r > CC_distance.values.current
         g = gravity CC_gravity.values.current, b1.mass, b2.mass, r
         new V2 -d.x / r*g, -d.y / r*g
-      else new V2
+      else V2::Zero()
 
     gravity = (G, m1, m2, r) -> G*m1*m2 / r*r
     negateV2 = (v) -> new V2 -v.x, -v.y
