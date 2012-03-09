@@ -51,24 +51,24 @@ Fn =
     f.apply @, (args1.concat args2).reverse()
 
   Currier: class
-    constructor: (@f, @args...) ->
+    constructor: (f, args...) ->
+      @f    = -> f
+      @args =  -> args
 
     curry: (args...) =>
-      @args.push x for x in args
-      @curry
+      @args().push x for x in args
+      @
 
     end: (that = null) =>
-      @f.apply that, @args
+      @f().apply that, @args()
 
   nCurry: (n, f, args...) ->
     f$ = new Fn.Currier f
-    f$.curry.apply this, args
-    nCurry$ = (n, args...) ->
-      f$.curry.apply f, args
+    nCurry$ = (n, f, args...) ->
       if (n -= args.length) > 0
-        Fn.partial nCurry$, n
-      else f$.end()
-    nCurry$ n - args.length
+        Fn.partial nCurry$, n, (f.curry.apply @, args)
+      else (f.curry.apply @, args).end @
+    nCurry$ (n - args.length), (f$.curry.apply @, args)
 
 Function::curry = (args...) ->
   Fn.nCurry.apply @, [@length, @].concat args
