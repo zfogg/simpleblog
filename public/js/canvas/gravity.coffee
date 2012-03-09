@@ -1,10 +1,10 @@
 # Dependencies: canvas-controls, canvas-tools
 
 Gravity = (canvas) ->
-  ctx = canvas.getContext "2d"
+  ctx                   = canvas.getContext "2d"
 
-  gameTime = 0
-  squares  = []
+  gameTime              = 0
+  squares               = []
 
   defaultGravity        = (C$.Math.randomBetween 4, 8) * Math.pow 10, -6
   defaultFriction       = (C$.Math.randomBetween 3, 7) * Math.pow 10, -4
