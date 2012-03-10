@@ -6,13 +6,6 @@ Fn =
 
   map: (f, xs) -> f x for x in xs
 
- #compose :: ((a -> b) || [(a -> b)])... -> (a -> b)
-  compose: (args...) ->
-    fs = [].concat f, fs for f in args
-    (x) ->
-      x = f x for f in fs.reverse().tail()
-      x
-
   take: (n, xs) -> xs[0...n]
   drop: (n, xs) -> xs[n..]
 
@@ -43,35 +36,31 @@ Fn =
   memoize: (compose, hash = Fn.id) ->
     Fn.partial ((xs, x) -> xs[hash x]), compose()
 
+ #compose :: ((a -> b) || [(a -> b)])... -> (a -> b)
+  compose: (args...) ->
+    fs = [].concat f, fs for f in args
+    (x) ->
+      x = f x for f in fs.reverse().tail()
+      x
+
  #partial :: (a... -> b... -> c) -> a... -> (b... -> c)
   partial: (f, args1...) -> (args2...) ->
     f.apply @, args1.concat args2
+ #partial$ :: (a... -> b... -> c) -> [a] -> (b... -> c)
+  partial$: (f, args) ->
+    Fn.partial.apply @, [f].concat args
  #flip :: (a... -> b... -> c) -> b... -> (a... -> c)
   flip: (f, args1...) -> (args2...) ->
     f.apply @, (args1.concat args2).reverse()
 
-  Currier: class
-    constructor: (f, args...) ->
-      @f    = -> f
-      @args =  -> args
-
-    curry: (args...) =>
-      @args().push x for x in args
-      @
-
-    end: (that = null) =>
-      @f().apply that, @args()
-
-  nCurry: (n, f, args...) ->
-    f$ = new Fn.Currier f
-    nCurry$ = (n, f, args...) ->
-      if (n -= args.length) > 0
-        Fn.partial nCurry$, n, (f.curry.apply @, args)
-      else (f.curry.apply @, args).end @
-    nCurry$ (n - args.length), (f$.curry.apply @, args)
-
 Function::curry = (args...) ->
-  Fn.nCurry.apply @, [@length, @].concat args
+  curry$ = (n, f, args...) ->
+    curry$$ = (n, f, args...) ->
+      if n > args.length
+        Fn.partial curry$$, (n - args.length), (Fn.partial$ f, args)
+      else f args
+    curry$$ (n - args.length), (Fn.partial$ f, args)
+  curry$.apply @, [@length, @].concat args
 
 $Math =
 
