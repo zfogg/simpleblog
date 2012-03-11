@@ -52,15 +52,24 @@ Fn =
  #flip :: (a... -> b... -> c) -> b... -> (a... -> c)
   flip: (f, args1...) -> (args2...) ->
     f.apply @, (args1.concat args2).reverse()
+  flip$: (f, args) ->
+    Fn.flip.apply @, [f].concat args
+
+  curry: (n, f, args...) ->
+    Fn.curry$ (n - args.length), (Fn.partial$ f, args)
+  curryFlip: (n, f, args...) ->
+    Fn.curry$ (n - args.length), (Fn.flip$ f, args)
+
+  curry$: (n, f, args...) ->
+    if n > args.length
+      Fn.partial Fn.curry$, (n - args.length), (Fn.partial$ f, args)
+    else f.apply @, args
+
 
 Function::curry = (args...) ->
-  curry$ = (n, f, args...) ->
-    curry$$ = (n, f, args...) ->
-      if n > args.length
-        Fn.partial curry$$, (n - args.length), (Fn.partial$ f, args)
-      else f args
-    curry$$ (n - args.length), (Fn.partial$ f, args)
-  curry$.apply @, [@length, @].concat args
+  Fn.curry.apply @, [@length, @].concat args
+Function::curryFlip = (args...) ->
+  Fn.curryFlip.apply @, [@length, @].concat args
 
 $Math =
 

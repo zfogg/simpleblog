@@ -25,7 +25,6 @@ html ->
         script src: "/js/libs/shBrushes/shBrushCSharp.js"
         script -> "SyntaxHighlighter.all()"
 
-        script src: "/js/libs/modernizr-2.0.6.min.js"
         script src: "//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
         coffeescript -> window.jQuery or document.write '<script src="/media/js/libs/jquery-1.6.2.min.js"><\/script>'
 
